@@ -117,14 +117,18 @@ function Footer() {
                     <FaWhatsapp />
                   </a>
                   <a 
-                    href="#" 
+                    href="https://www.facebook.com/share/16eyYVLpiW/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
                     className="text-primary-300 hover:text-white transition-colors text-xl"
                     aria-label="Facebook"
                   >
                     <FaFacebook />
                   </a>
                   <a 
-                    href="#" 
+                    href="https://www.instagram.com/oakk_timber?igsh=bGowd3dhcHI0a3Nt" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
                     className="text-primary-300 hover:text-white transition-colors text-xl"
                     aria-label="Instagram"
                   >
