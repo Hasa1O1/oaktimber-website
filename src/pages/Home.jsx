@@ -117,18 +117,15 @@ function Home() {
               </div>
             </div>
 
-            {/* Right side - Image placeholder */}
+            {/* Right side - Hero Image */}
             <div className="relative animate-slide-in-right">
-              <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary-300 to-primary-500 shadow-2xl overflow-hidden">
-                {/* Placeholder for hero image - replace with actual image */}
-                <div className="w-full h-full flex items-center justify-center text-white">
-                  <div className="text-center p-8">
-                    <p className="text-2xl font-semibold mb-2">Hero Image</p>
-                    <p className="text-sm opacity-90">
-                      Replace with photo of featured furniture piece or workshop
-                    </p>
-                  </div>
-                </div>
+              <div className="aspect-square rounded-2xl shadow-2xl overflow-hidden">
+                {/* Hero image */}
+                <img 
+                  src="/images/hero image.png" 
+                  alt="OAKTIMBER - Handcrafted wooden furniture and custom installations"
+                  className="w-full h-full object-cover"
+                />
               </div>
               {/* Decorative elements */}
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-600 rounded-2xl opacity-20 -z-10"></div>
