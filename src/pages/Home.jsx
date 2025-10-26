@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { FaArrowRight, FaCheck, FaStar } from 'react-icons/fa'
+import { FaArrowRight, FaCheck } from 'react-icons/fa'
 
 /**
  * Home Page Component
@@ -11,7 +11,6 @@ import { FaArrowRight, FaCheck, FaStar } from 'react-icons/fa'
  * - Business summary and value propositions
  * - Featured products preview
  * - Why choose us section
- * - Customer testimonials
  * - Call to action section
  */
 function Home() {
@@ -34,28 +33,6 @@ function Home() {
       name: 'Wardrobe Installation',
       description: 'Complete wardrobe systems and closet installations tailored to your needs.',
       image: '/images/Waderope installation.png',
-    },
-  ]
-
-  // Customer testimonials
-  const testimonials = [
-    {
-      id: 1,
-      name: 'Sarah M.',
-      text: 'OAKTIMBER transformed my living room with a beautiful custom coffee table. The craftsmanship is outstanding!',
-      rating: 5,
-    },
-    {
-      id: 2,
-      name: 'John K.',
-      text: 'Professional service from start to finish. My kitchen units are exactly what I envisioned. Highly recommend!',
-      rating: 5,
-    },
-    {
-      id: 3,
-      name: 'Grace T.',
-      text: 'The attention to detail and quality of work is remarkable. My study desk is both beautiful and functional.',
-      rating: 5,
     },
   ]
 
@@ -246,41 +223,6 @@ function Home() {
                 ))}
               </ul>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="section-padding bg-primary-900 text-white">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="text-white mb-4">What Our Clients Say</h2>
-            <p className="text-primary-200 text-lg max-w-2xl mx-auto">
-              Don't just take our word for it - hear from our satisfied customers
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="bg-primary-800 p-6 rounded-lg space-y-4">
-                {/* Star rating */}
-                <div className="flex gap-1">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <FaStar key={i} className="text-yellow-400" />
-                  ))}
-                </div>
-                
-                {/* Testimonial text */}
-                <p className="text-primary-100 italic">
-                  "{testimonial.text}"
-                </p>
-                
-                {/* Customer name */}
-                <p className="font-semibold text-primary-200">
-                  - {testimonial.name}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
