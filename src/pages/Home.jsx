@@ -19,21 +19,21 @@ function Home() {
   const featuredProducts = [
     {
       id: 1,
-      name: 'Coffee Tables',
-      description: 'Elegant handcrafted coffee tables that become the centerpiece of your living room.',
-      image: '/images/coffee-table-placeholder.jpg',
+      name: 'TV Stands',
+      description: 'Wall-mounted and floor-standing TV units with integrated storage solutions.',
+      image: '/images/TV Stand.png',
     },
     {
       id: 2,
-      name: 'Study Tables',
-      description: 'Functional and stylish desks perfect for home offices and study spaces.',
-      image: '/images/study-table-placeholder.jpg',
+      name: 'Shelves',
+      description: 'Custom-built shelves and storage solutions designed to maximize your space.',
+      image: '/images/Shelves.png',
     },
     {
       id: 3,
-      name: 'Kitchen Units',
-      description: 'Custom-designed kitchen installations tailored to your space and style.',
-      image: '/images/kitchen-unit-placeholder.jpg',
+      name: 'Wardrobe Installation',
+      description: 'Complete wardrobe systems and closet installations tailored to your needs.',
+      image: '/images/Waderope installation.png',
     },
   ]
 
@@ -168,9 +168,13 @@ function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
               <div key={product.id} className="card group">
-                {/* Product image placeholder */}
-                <div className="aspect-video bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
-                  <p className="text-white font-semibold">Product Image</p>
+                {/* Product image */}
+                <div className="aspect-video overflow-hidden bg-gray-100">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
                 
                 {/* Product details */}
