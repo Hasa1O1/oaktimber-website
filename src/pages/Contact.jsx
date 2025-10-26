@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaPhone, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaClock, FaUser } from 'react-icons/fa'
+import { FaPhone, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaClock, FaUser, FaSms, FaTimes } from 'react-icons/fa'
 
 /**
  * Contact Page Component
@@ -24,6 +24,9 @@ function Contact() {
   
   // Form submission status
   const [submitStatus, setSubmitStatus] = useState(null)
+  
+  // Modal state for sending options
+  const [showSendModal, setShowSendModal] = useState(false)
 
   // Service options for the dropdown
   const serviceOptions = [
@@ -52,14 +55,61 @@ function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    // Here you would typically send the form data to a backend API
-    // For now, we'll just show a success message
-    console.log('Form submitted:', formData)
+    // Validate form data
+    if (!formData.name || !formData.email || !formData.phone || !formData.service || !formData.message) {
+      setSubmitStatus('error')
+      setTimeout(() => {
+        setSubmitStatus(null)
+      }, 3000)
+      return
+    }
     
-    // Show success message
-    setSubmitStatus('success')
-    
-    // Reset form
+    // Open modal with sending options
+    setShowSendModal(true)
+  }
+  
+  // Generate formatted message for sharing
+  const generateMessage = () => {
+    return `Hello from ${formData.name}!
+
+Service: ${formData.service}
+Contact: ${formData.phone}
+Email: ${formData.email}
+
+Message:
+${formData.message}
+
+Requested via OAKTIMBER website.`
+  }
+  
+  // Handle email sending
+  const handleSendEmail = () => {
+    const subject = `New Contact: ${formData.service} - ${formData.name}`
+    const body = generateMessage()
+    const mailtoLink = `mailto:Dinganipeleka15@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    window.location.href = mailtoLink
+    resetFormAndCloseModal()
+  }
+  
+  // Handle WhatsApp sending
+  const handleSendWhatsApp = () => {
+    const message = `Hello OAKTIMBER,%0A%0A${generateMessage()}`
+    const whatsappLink = `https://wa.me/260973131425?text=${encodeURIComponent(message.replace(/%0A/g, '\n'))}`
+    window.open(whatsappLink, '_blank')
+    resetFormAndCloseModal()
+  }
+  
+  // Handle SMS sending
+  const handleSendSMS = () => {
+    const body = generateMessage()
+    const smsLink = `sms:0973131425?body=${encodeURIComponent(body)}`
+    window.location.href = smsLink
+    resetFormAndCloseModal()
+  }
+  
+  // Reset form and close modal
+  const resetFormAndCloseModal = () => {
+    setShowSendModal(false)
     setFormData({
       name: '',
       email: '',
@@ -67,11 +117,15 @@ function Contact() {
       service: '',
       message: '',
     })
-    
-    // Clear success message after 5 seconds
+    setSubmitStatus('success')
     setTimeout(() => {
       setSubmitStatus(null)
     }, 5000)
+  }
+  
+  // Close modal
+  const closeModal = () => {
+    setShowSendModal(false)
   }
 
   return (
@@ -104,6 +158,13 @@ function Contact() {
                   <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
                     <p className="font-semibold">Thank you for your message!</p>
                     <p className="text-sm">We'll get back to you as soon as possible.</p>
+                  </div>
+                )}
+                
+                {/* Error message */}
+                {submitStatus === 'error' && (
+                  <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    <p className="font-semibold">Please fill in all required fields.</p>
                   </div>
                 )}
 
@@ -392,6 +453,71 @@ function Contact() {
           </div>
         </div>
       </section>
+
+      {/* Send Message Modal */}
+      {showSendModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={closeModal}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="bg-primary-900 text-white p-6 flex items-center justify-between">
+              <h3 className="text-2xl font-bold">Choose How to Send</h3>
+              <button 
+                onClick={closeModal}
+                className="text-white hover:text-gray-200 transition-colors"
+                aria-label="Close modal"
+              >
+                <FaTimes className="text-2xl" />
+              </button>
+            </div>
+
+            {/* Modal Body - Preview of message */}
+            <div className="p-6 space-y-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-700 mb-3">Message Preview:</h4>
+                <div className="bg-white border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto">
+                  <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">
+                    {generateMessage()}
+                  </pre>
+                </div>
+              </div>
+              
+              <p className="text-gray-600 text-sm text-center">
+                Select a platform to send your message. The form data will be auto-filled.
+              </p>
+            </div>
+
+            {/* Modal Footer - Action Buttons */}
+            <div className="p-6 bg-gray-50 flex flex-col sm:flex-row gap-4">
+              {/* Email Button */}
+              <button
+                onClick={handleSendEmail}
+                className="flex-1 flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+              >
+                <FaEnvelope className="text-xl" />
+                Send via Email
+              </button>
+
+              {/* WhatsApp Button */}
+              <button
+                onClick={handleSendWhatsApp}
+                className="flex-1 flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+              >
+                <FaWhatsapp className="text-xl" />
+                Send via WhatsApp
+              </button>
+
+              {/* SMS Button */}
+              <button
+                onClick={handleSendSMS}
+                className="flex-1 flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+              >
+                <FaSms className="text-xl" />
+                Send via SMS
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
