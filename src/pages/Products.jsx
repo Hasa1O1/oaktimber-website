@@ -71,7 +71,8 @@ function Products() {
       category: 'installations',
       description: 'Wall-mounted and floor-standing TV units with integrated storage solutions.',
       features: ['Cable management', 'Storage compartments', 'Wall mounting available', 'Custom sizing'],
-      image: '/images/tv-stands.jpg',
+      image: '/images/TV Stand.png',
+      price: 'K2,500',
     },
     {
       id: 7,
@@ -146,19 +147,36 @@ function Products() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProducts.map((product) => (
               <div key={product.id} className="card animate-fade-in">
-                {/* Product image placeholder */}
-                <div className="aspect-video bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
-                  <div className="text-center text-white p-4">
-                    <p className="font-semibold">{product.name}</p>
-                    <p className="text-sm opacity-90 mt-1">Product Image</p>
+                {/* Product image */}
+                {product.image ? (
+                  <div className="aspect-video overflow-hidden bg-gray-100">
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                </div>
+                ) : (
+                  <div className="aspect-video bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
+                    <div className="text-center text-white p-4">
+                      <p className="font-semibold">{product.name}</p>
+                      <p className="text-sm opacity-90 mt-1">Product Image</p>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Product details */}
                 <div className="p-6 space-y-4">
-                  <h3 className="text-primary-800">
-                    {product.name}
-                  </h3>
+                  <div className="flex items-start justify-between">
+                    <h3 className="text-primary-800">
+                      {product.name}
+                    </h3>
+                    {product.price && (
+                      <span className="text-xl font-bold text-primary-600">
+                        {product.price}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-gray-600">
                     {product.description}
                   </p>
