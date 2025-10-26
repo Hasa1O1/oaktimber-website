@@ -131,6 +131,40 @@ GitHub Pages is free but requires a few extra steps for React apps.
 
 Visit: https://YOUR-USERNAME.github.io/oaktimber-website
 
+## Alternative: Deploy to Render (What You're Using)
+
+You're currently using Render for hosting. Here's how to fix the 404 error on refresh:
+
+### Fixing the 404 Error on Refresh
+
+The issue is that Render needs explicit configuration for React Router (client-side routing).
+
+**Step 1:** Make sure your Render site settings are:
+- **Build Command:** `npm run build`
+- **Publish Directory:** `dist`
+- **Environment:** Node
+
+**Step 2:** The `_redirects` file should be working. If you're still getting 404 errors:
+
+1. Go to your Render dashboard
+2. Click on your static site
+3. Go to "Settings" → "Headers"
+4. Add a new header:
+   - **Path Pattern:** `/*`
+   - **Name:** `X-Rewrite-URL`
+   - **Value:** `/index.html`
+
+This tells Render to serve `index.html` for all routes.
+
+**Alternative Fix:** If headers don't work, contact Render support and ask them to enable "Single Page App" mode for your static site.
+
+### Verify the Fix
+
+1. Deploy your site
+2. Navigate to any page (e.g., `/about`)
+3. **Refresh the page** (F5 or Ctrl+R)
+4. If you still see "Not Found," try the header fix above
+
 ## After Deployment Checklist
 
 ✅ Test all pages load correctly  
