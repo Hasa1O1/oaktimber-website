@@ -100,14 +100,6 @@ function Products() {
     },
     {
       id: 10,
-      name: 'Wardrobe Installation',
-      category: 'installations',
-      description: 'Complete wardrobe systems and closet installations tailored to your needs.',
-      features: ['Custom design', 'Space optimization', 'Professional installation', 'Multiple storage options'],
-      image: '/images/Waderope installation.png',
-    },
-    {
-      id: 11,
       name: 'Drilling Services',
       category: 'services',
       description: 'Professional drilling and mounting services for all your installation needs.',
