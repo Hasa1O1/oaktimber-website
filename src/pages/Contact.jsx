@@ -456,11 +456,11 @@ Requested via OAKTIMBER website.`
 
       {/* Send Message Modal */}
       {showSendModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-auto" onClick={closeModal}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={closeModal}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[95vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="bg-primary-900 text-white p-6 flex items-center justify-between">
-              <h3 className="text-2xl font-bold">Choose How to Send</h3>
+            <div className="bg-primary-900 text-white p-6 flex items-center justify-between flex-shrink-0">
+              <h3 className="text-xl md:text-2xl font-bold">Choose How to Send</h3>
               <button 
                 onClick={closeModal}
                 className="text-white hover:text-gray-200 transition-colors"
@@ -470,50 +470,52 @@ Requested via OAKTIMBER website.`
               </button>
             </div>
 
-            {/* Modal Body - Preview of message */}
-            <div className="p-6 space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-semibold text-gray-700 mb-3">Message Preview:</h4>
-                <div className="bg-white border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto">
-                  <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">
-                    {generateMessage()}
-                  </pre>
+            {/* Modal Body - Preview of message (scrollable) */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-700 mb-3">Message Preview:</h4>
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 max-h-48 overflow-y-auto">
+                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">
+                      {generateMessage()}
+                    </pre>
+                  </div>
                 </div>
+                
+                <p className="text-gray-600 text-sm text-center">
+                  Select a platform to send your message. The form data will be auto-filled.
+                </p>
               </div>
-              
-              <p className="text-gray-600 text-sm text-center">
-                Select a platform to send your message. The form data will be auto-filled.
-              </p>
             </div>
 
-            {/* Modal Footer - Action Buttons */}
-            <div className="p-6 bg-gray-50 border-t-2 border-gray-200">
+            {/* Modal Footer - Action Buttons (always visible) */}
+            <div className="bg-gray-50 border-t-2 border-gray-200 p-6 flex-shrink-0">
               <div className="flex flex-col md:flex-row gap-4">
                 {/* Email Button */}
                 <button
                   onClick={handleSendEmail}
-                  className="flex-1 flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+                  className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-lg"
                 >
-                  <FaEnvelope className="text-xl" />
-                  Send via Email
+                  <FaEnvelope className="text-lg" />
+                  <span className="text-sm md:text-base">Send via Email</span>
                 </button>
 
                 {/* WhatsApp Button */}
                 <button
                   onClick={handleSendWhatsApp}
-                  className="flex-1 flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+                  className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-lg"
                 >
-                  <FaWhatsapp className="text-xl" />
-                  Send via WhatsApp
+                  <FaWhatsapp className="text-lg" />
+                  <span className="text-sm md:text-base">Send via WhatsApp</span>
                 </button>
 
                 {/* SMS Button */}
                 <button
                   onClick={handleSendSMS}
-                  className="flex-1 flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-lg"
                 >
-                  <FaSms className="text-xl" />
-                  Send via SMS
+                  <FaSms className="text-lg" />
+                  <span className="text-sm md:text-base">Send via SMS</span>
                 </button>
               </div>
               
