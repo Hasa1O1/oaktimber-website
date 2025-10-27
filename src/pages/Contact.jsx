@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaPhone, FaEnvelope, FaWhatsapp, FaMapMarkerAlt, FaClock, FaUser, FaSms, FaTimes } from 'react-icons/fa'
+import { FaPhone, FaEnvelope, FaWhatsapp, FaClock, FaUser, FaSms, FaTimes } from 'react-icons/fa'
 
 /**
  * Contact Page Component
@@ -370,30 +370,6 @@ Requested via OAKTIMBER website.`
                   We typically respond to all inquiries within 24 hours during business days.
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Map Section - Placeholder */}
-      <section className="section-padding bg-primary-50">
-        <div className="container-custom">
-          <div className="text-center mb-8">
-            <h2 className="text-primary-900 mb-4">Find Us</h2>
-            <p className="text-gray-700">Visit our workshop to see our work firsthand</p>
-          </div>
-          
-          {/* Map placeholder */}
-          <div className="aspect-video max-w-4xl mx-auto bg-gradient-to-br from-primary-200 to-primary-400 rounded-2xl shadow-xl flex items-center justify-center">
-            <div className="text-center text-white p-8">
-              <FaMapMarkerAlt className="text-6xl mb-4 mx-auto" />
-              <p className="text-xl font-semibold mb-2">Google Map Location</p>
-              <p className="text-sm opacity-90">
-                Replace this with an embedded Google Map showing workshop location
-              </p>
-              <p className="text-sm opacity-90 mt-2">
-                Add your specific address here
-              </p>
             </div>
           </div>
         </div>
