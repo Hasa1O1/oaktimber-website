@@ -24,7 +24,6 @@ function Header() {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Products & Services', path: '/products' },
-    { name: 'Gallery', path: '/gallery' },
     { name: 'Contact', path: '/contact' },
   ]
 

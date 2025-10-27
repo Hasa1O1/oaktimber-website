@@ -31,15 +31,15 @@ function Products() {
       category: 'furniture',
       description: 'Handcrafted coffee tables in various sizes and styles. Perfect centerpiece for your living room.',
       features: ['Custom sizes available', 'Multiple wood finishes', 'Durable construction', 'Modern & classic designs'],
-      image: '/images/coffee-table.jpg',
+      image: '/images/Coffee Table.png',
     },
     {
       id: 2,
-      name: 'Study Tables',
+      name: 'Book Shelves',
       category: 'furniture',
-      description: 'Functional and elegant study desks designed for comfort and productivity.',
-      features: ['Ergonomic design', 'Built-in storage options', 'Cable management', 'Customizable dimensions'],
-      image: '/images/study-table.jpg',
+      description: 'Functional and elegant book shelves designed for organizing and displaying your collection.',
+      features: ['Customizable dimensions', 'Multiple wood finishes', 'Wall-mounted or freestanding', 'Durable construction'],
+      image: '/images/Book Shelves.png',
     },
     {
       id: 3,
@@ -47,7 +47,7 @@ function Products() {
       category: 'furniture',
       description: 'Comfortable seating solutions from dining chairs to bar stools.',
       features: ['Comfortable seating', 'Sturdy construction', 'Various styles', 'Custom upholstery available'],
-      image: '/images/chairs.jpg',
+      image: '/images/Chairs and Stools.png',
     },
     {
       id: 4,
@@ -55,7 +55,7 @@ function Products() {
       category: 'furniture',
       description: 'Versatile benches for indoor and outdoor use, combining style with functionality.',
       features: ['Indoor & outdoor options', 'Custom lengths', 'Storage bench options', 'Weather-resistant finishes'],
-      image: '/images/benches.jpg',
+      image: '/images/Benches.png',
     },
     {
       id: 5,

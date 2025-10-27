@@ -456,7 +456,7 @@ Requested via OAKTIMBER website.`
 
       {/* Send Message Modal */}
       {showSendModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={closeModal}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-auto" onClick={closeModal}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
             <div className="bg-primary-900 text-white p-6 flex items-center justify-between">
@@ -487,32 +487,42 @@ Requested via OAKTIMBER website.`
             </div>
 
             {/* Modal Footer - Action Buttons */}
-            <div className="p-6 bg-gray-50 flex flex-col sm:flex-row gap-4">
-              {/* Email Button */}
-              <button
-                onClick={handleSendEmail}
-                className="flex-1 flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
-              >
-                <FaEnvelope className="text-xl" />
-                Send via Email
-              </button>
+            <div className="p-6 bg-gray-50 border-t-2 border-gray-200">
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Email Button */}
+                <button
+                  onClick={handleSendEmail}
+                  className="flex-1 flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+                >
+                  <FaEnvelope className="text-xl" />
+                  Send via Email
+                </button>
 
-              {/* WhatsApp Button */}
-              <button
-                onClick={handleSendWhatsApp}
-                className="flex-1 flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
-              >
-                <FaWhatsapp className="text-xl" />
-                Send via WhatsApp
-              </button>
+                {/* WhatsApp Button */}
+                <button
+                  onClick={handleSendWhatsApp}
+                  className="flex-1 flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+                >
+                  <FaWhatsapp className="text-xl" />
+                  Send via WhatsApp
+                </button>
 
-              {/* SMS Button */}
+                {/* SMS Button */}
+                <button
+                  onClick={handleSendSMS}
+                  className="flex-1 flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+                >
+                  <FaSms className="text-xl" />
+                  Send via SMS
+                </button>
+              </div>
+              
+              {/* Cancel Button */}
               <button
-                onClick={handleSendSMS}
-                className="flex-1 flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors shadow-lg"
+                onClick={closeModal}
+                className="w-full mt-4 px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition-colors"
               >
-                <FaSms className="text-xl" />
-                Send via SMS
+                Cancel
               </button>
             </div>
           </div>
