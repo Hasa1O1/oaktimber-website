@@ -63,7 +63,7 @@ function Products() {
       category: 'installations',
       description: 'Complete kitchen cabinet systems designed and installed to maximize your space.',
       features: ['Custom design', 'Quality hardware', 'Professional installation', 'Durable finishes'],
-      image: '/images/kitchen-units.jpg',
+      image: '/images/Kitchen Unit.png',
     },
     {
       id: 6,
