@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaCheck } from 'react-icons/fa'
+import { FaCheck, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
 /**
  * Products & Services Page Component
@@ -14,6 +14,27 @@ import { FaCheck } from 'react-icons/fa'
 function Products() {
   // State to track active category filter
   const [activeCategory, setActiveCategory] = useState('all')
+
+  // State to track current image for each product card
+  const [productImageIndices, setProductImageIndices] = useState({})
+
+  // Function to navigate product images
+  const navigateProductImage = (productId, direction) => {
+    setProductImageIndices(prev => {
+      const currentIndex = prev[productId] || 0
+      const product = products.find(p => p.id === productId)
+      const maxIndex = product.images ? product.images.length - 1 : 0
+      
+      let newIndex
+      if (direction === 'next') {
+        newIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1
+      } else {
+        newIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1
+      }
+      
+      return { ...prev, [productId]: newIndex }
+    })
+  }
 
   // Product categories for filtering
   const categories = [
@@ -31,7 +52,7 @@ function Products() {
       category: 'furniture',
       description: 'Handcrafted coffee tables in various sizes and styles. Perfect centerpiece for your living room.',
       features: ['Custom sizes available', 'Multiple wood finishes', 'Durable construction', 'Modern & classic designs'],
-      image: '/images/Coffee Table.png',
+      images: ['/images/Coffee Table.png'],
     },
     {
       id: 2,
@@ -39,7 +60,7 @@ function Products() {
       category: 'furniture',
       description: 'Functional and elegant book shelves designed for organizing and displaying your collection.',
       features: ['Customizable dimensions', 'Multiple wood finishes', 'Wall-mounted or freestanding', 'Durable construction'],
-      image: '/images/Book Shelves.png',
+      images: ['/images/Book Shelves 1.png', '/images/Book Shelves 2.png'],
     },
     {
       id: 3,
@@ -47,7 +68,7 @@ function Products() {
       category: 'furniture',
       description: 'Comfortable seating solutions from dining chairs to bar stools.',
       features: ['Comfortable seating', 'Sturdy construction', 'Various styles', 'Custom upholstery available'],
-      image: '/images/Chairs and Stools.png',
+      images: ['/images/Chairs and Stools.png'],
     },
     {
       id: 4,
@@ -55,7 +76,7 @@ function Products() {
       category: 'furniture',
       description: 'Versatile benches for indoor and outdoor use, combining style with functionality.',
       features: ['Indoor & outdoor options', 'Custom lengths', 'Storage bench options', 'Weather-resistant finishes'],
-      image: '/images/Benches.png',
+      images: ['/images/Benches.png'],
     },
     {
       id: 5,
@@ -63,7 +84,7 @@ function Products() {
       category: 'installations',
       description: 'Complete kitchen cabinet systems designed and installed to maximize your space.',
       features: ['Custom design', 'Quality hardware', 'Professional installation', 'Durable finishes'],
-      image: '/images/Kitchen Unit.png',
+      images: ['/images/Kitchen Unit.png'],
     },
     {
       id: 6,
@@ -71,7 +92,7 @@ function Products() {
       category: 'installations',
       description: 'Wall-mounted and floor-standing TV units with integrated storage solutions.',
       features: ['Cable management', 'Storage compartments', 'Wall mounting available', 'Custom sizing'],
-      image: '/images/TV Stand.png',
+      images: ['/images/TV Stand.png'],
       price: 'K2,500',
     },
     {
@@ -80,7 +101,7 @@ function Products() {
       category: 'services',
       description: 'Professional installation of curtain rods and window treatment hardware.',
       features: ['Precise measurements', 'Secure mounting', 'All window types', 'Hardware included'],
-      image: '/images/curtain-rods.jpg',
+      images: ['/images/curtain-rods.jpg'],
     },
     {
       id: 8,
@@ -88,7 +109,7 @@ function Products() {
       category: 'installations',
       description: 'Custom wooden wall art and decorative installations to enhance your space.',
       features: ['Custom designs', 'Unique pieces', 'Professional mounting', 'Various sizes'],
-      image: '/images/wall-art.jpg',
+      images: ['/images/wall-art.jpg'],
     },
     {
       id: 9,
@@ -96,7 +117,7 @@ function Products() {
       category: 'installations',
       description: 'Custom-built shelves and storage solutions designed to maximize your space.',
       features: ['Custom sizing', 'Various materials', 'Wall-mounted or freestanding', 'Professional installation'],
-      image: '/images/Shelves.png',
+      images: ['/images/Shelves.png'],
     },
     {
       id: 10,
@@ -104,7 +125,7 @@ function Products() {
       category: 'services',
       description: 'Professional drilling and mounting services for all your installation needs.',
       features: ['All surface types', 'Precise drilling', 'Clean work', 'Quick service'],
-      image: '/images/drilling.jpg',
+      images: ['/images/drilling.jpg'],
     },
   ]
 
@@ -153,58 +174,102 @@ function Products() {
       <section className="section-padding bg-accent-cream">
         <div className="container-custom">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="card animate-fade-in">
-                {/* Product image */}
-                {product.image ? (
-                  <div className="aspect-video overflow-hidden bg-gray-100">
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="aspect-video bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
-                    <div className="text-center text-white p-4">
-                      <p className="font-semibold">{product.name}</p>
-                      <p className="text-sm opacity-90 mt-1">Product Image</p>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Product details */}
-                <div className="p-6 space-y-4">
-                  <div className="flex items-start justify-between">
-                    <h3 className="text-primary-800">
-                      {product.name}
-                    </h3>
-                    {product.price && (
-                      <span className="text-xl font-bold text-primary-600">
-                        {product.price}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-gray-600">
-                    {product.description}
-                  </p>
-                  
-                  {/* Features list */}
-                  <ul className="space-y-2">
-                    {product.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
-                        <div className="mt-1 flex-shrink-0">
-                          <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
-                            <FaCheck className="text-primary-600 text-xs" />
+            {filteredProducts.map((product) => {
+              const currentImageIndex = productImageIndices[product.id] || 0
+              const currentImage = product.images ? product.images[currentImageIndex] : null
+              const hasMultipleImages = product.images && product.images.length > 1
+              
+              return (
+                <div key={product.id} className="card animate-fade-in group">
+                  {/* Product image carousel */}
+                  {currentImage ? (
+                    <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                      <img 
+                        src={currentImage} 
+                        alt={product.name}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                      />
+                      
+                      {/* Navigation arrows for multiple images */}
+                      {hasMultipleImages && (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              navigateProductImage(product.id, 'prev')
+                            }}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            aria-label="Previous image"
+                          >
+                            <FaChevronLeft className="text-sm" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              navigateProductImage(product.id, 'next')
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            aria-label="Next image"
+                          >
+                            <FaChevronRight className="text-sm" />
+                          </button>
+                          
+                          {/* Image indicators */}
+                          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
+                            {product.images.map((_, index) => (
+                              <div
+                                key={index}
+                                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                                  index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                                }`}
+                              />
+                            ))}
                           </div>
-                        </div>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="aspect-square bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
+                      <div className="text-center text-white p-4">
+                        <p className="font-semibold">{product.name}</p>
+                        <p className="text-sm opacity-90 mt-1">Product Image</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Product details */}
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-primary-800">
+                        {product.name}
+                      </h3>
+                      {product.price && (
+                        <span className="text-xl font-bold text-primary-600">
+                          {product.price}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-gray-600">
+                      {product.description}
+                    </p>
+                    
+                    {/* Features list */}
+                    <ul className="space-y-2">
+                      {product.features.map((feature, index) => (
+                        <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                          <div className="mt-1 flex-shrink-0">
+                            <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
+                              <FaCheck className="text-primary-600 text-xs" />
+                            </div>
+                          </div>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* No results message */}

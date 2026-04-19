@@ -126,7 +126,7 @@ function Footer() {
                     <FaFacebook />
                   </a>
                   <a 
-                    href="https://www.instagram.com/oakk_timber?igsh=bGowd3dhcHI0a3Nt" 
+                    href="https://www.instagram.com/oaktimber_zambia?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-primary-300 hover:text-white transition-colors text-xl"

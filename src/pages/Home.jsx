@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FaArrowRight, FaCheck } from 'react-icons/fa'
+import { FaArrowRight, FaCheck, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
 /**
  * Home Page Component
@@ -14,25 +14,57 @@ import { FaArrowRight, FaCheck } from 'react-icons/fa'
  * - Call to action section
  */
 function Home() {
+  // State to track which hero image is currently displayed (0, 1, or 2)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+  // State to track current image for each product card
+  const [productImageIndices, setProductImageIndices] = useState({})
+
+  // Effect to rotate through hero images every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % 3)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Function to navigate product images
+  const navigateProductImage = (productId, direction) => {
+    setProductImageIndices(prev => {
+      const currentIndex = prev[productId] || 0
+      const product = featuredProducts.find(p => p.id === productId)
+      const maxIndex = product.images.length - 1
+      
+      let newIndex
+      if (direction === 'next') {
+        newIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1
+      } else {
+        newIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1
+      }
+      
+      return { ...prev, [productId]: newIndex }
+    })
+  }
+
   // Featured products data for display on home page
   const featuredProducts = [
     {
       id: 1,
       name: 'TV Stands',
       description: 'Wall-mounted and floor-standing TV units with integrated storage solutions.',
-      image: '/images/TV Stand.png',
+      images: ['/images/TV Stand.png'],
     },
     {
       id: 2,
-      name: 'Shelves',
+      name: 'Book Shelves',
       description: 'Custom-built shelves and storage solutions designed to maximize your space.',
-      image: '/images/Shelves.png',
+      images: ['/images/Book Shelves 1.png', '/images/Book Shelves 2.png'],
     },
     {
       id: 3,
       name: 'Wardrobe Installation',
       description: 'Complete wardrobe systems and closet installations tailored to your needs.',
-      image: '/images/Waderope installation.png',
+      images: ['/images/Waderope installation.png'],
     },
   ]
 
@@ -94,16 +126,35 @@ function Home() {
               </div>
             </div>
 
-            {/* Right side - Hero Image */}
-            <div className="relative animate-slide-in-right">
-              <div className="aspect-square rounded-2xl shadow-2xl overflow-hidden">
-                {/* Hero image */}
+            {/* Right side - Rotating Hero Cards */}
+            <div className="relative animate-slide-in-right h-96">
+              {/* Card 3 - Back card, shows corner only */}
+              <div className={`absolute inset-0 rounded-2xl shadow-lg overflow-hidden transform -rotate-6 translate-y-4 translate-x-4 z-0 transition-opacity duration-700 ${currentImageIndex === 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                 <img 
-                  src="/images/hero image.png" 
+                  src="/images/hero image 3.png" 
+                  alt="OAKTIMBER craftsmanship"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* Card 2 - Middle card, shows corner only */}
+              <div className={`absolute inset-0 rounded-2xl shadow-xl overflow-hidden transform rotate-3 translate-y-2 translate-x-2 z-10 transition-opacity duration-700 ${currentImageIndex === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                <img 
+                  src="/images/hero image 2.png" 
+                  alt="OAKTIMBER furniture"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* Card 1 - Front card, fully visible */}
+              <div className={`absolute inset-0 rounded-2xl shadow-2xl overflow-hidden z-20 transition-opacity duration-700 ${currentImageIndex === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                <img 
+                  src="/images/hero image 1.jpg" 
                   alt="OAKTIMBER - Handcrafted wooden furniture and custom installations"
                   className="w-full h-full object-cover"
                 />
               </div>
+              
               {/* Decorative elements */}
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-600 rounded-2xl opacity-20 -z-10"></div>
               <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary-400 rounded-full opacity-20 -z-10"></div>
@@ -143,35 +194,79 @@ function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
-              <div key={product.id} className="card group">
-                {/* Product image */}
-                <div className="aspect-video overflow-hidden bg-gray-100">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+            {featuredProducts.map((product) => {
+              const currentImageIndex = productImageIndices[product.id] || 0
+              const currentImage = product.images[currentImageIndex]
+              const hasMultipleImages = product.images.length > 1
+              
+              return (
+                <div key={product.id} className="card group">
+                  {/* Product image carousel */}
+                  <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                    <img 
+                      src={currentImage} 
+                      alt={product.name}
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    />
+                    
+                    {/* Navigation arrows for multiple images */}
+                    {hasMultipleImages && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            navigateProductImage(product.id, 'prev')
+                          }}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          aria-label="Previous image"
+                        >
+                          <FaChevronLeft className="text-sm" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            navigateProductImage(product.id, 'next')
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          aria-label="Next image"
+                        >
+                          <FaChevronRight className="text-sm" />
+                        </button>
+                        
+                        {/* Image indicators */}
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
+                          {product.images.map((_, index) => (
+                            <div
+                              key={index}
+                              className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                                index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Product details */}
+                  <div className="p-6 space-y-3">
+                    <h3 className="text-primary-800 group-hover:text-primary-600 transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-600">
+                      {product.description}
+                    </p>
+                    <Link 
+                      to="/products" 
+                      className="inline-flex items-center text-primary-600 font-medium hover:text-primary-700 gap-2"
+                    >
+                      Learn More
+                      <FaArrowRight className="text-xs" />
+                    </Link>
+                  </div>
                 </div>
-                
-                {/* Product details */}
-                <div className="p-6 space-y-3">
-                  <h3 className="text-primary-800 group-hover:text-primary-600 transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-600">
-                    {product.description}
-                  </p>
-                  <Link 
-                    to="/products" 
-                    className="inline-flex items-center text-primary-600 font-medium hover:text-primary-700 gap-2"
-                  >
-                    Learn More
-                    <FaArrowRight className="text-xs" />
-                  </Link>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           <div className="text-center mt-10">
@@ -188,16 +283,15 @@ function Home() {
         <div className="container-custom">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             
-            {/* Left side - Image placeholder */}
+            {/* Left side - Why Choose Us Image */}
             <div className="relative">
-              <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary-300 to-primary-600 shadow-xl flex items-center justify-center">
-                <div className="text-center text-white p-8">
-                  <p className="text-xl font-semibold mb-2">Workshop Image</p>
-                  <p className="text-sm opacity-90">
-                    Photo of craftsman at work or finished product
-                  </p>
-                </div>
-              </div>
+              <img 
+                src="/images/why choose us image..jpg" 
+                alt="OAKTIMBER workshop and craftsmanship"
+                className="w-full aspect-square object-cover rounded-2xl shadow-xl"
+              />
+              {/* Decorative element */}
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-400 rounded-2xl opacity-20 -z-10"></div>
             </div>
 
             {/* Right side - Benefits list */}

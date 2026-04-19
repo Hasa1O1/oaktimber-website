@@ -53,9 +53,11 @@ function Header() {
         <div className="flex items-center justify-between h-20">
           {/* Logo and Brand Name */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
-              <span className="text-2xl font-bold text-white">O</span>
-            </div>
+            <img 
+              src="/images/logo image.png" 
+              alt="Oaktimber Logo" 
+              className="w-12 h-12 rounded-lg transform group-hover:rotate-6 transition-transform duration-300"
+            />
             <div>
               <h1 className="text-2xl font-bold text-primary-800 tracking-tight">
                 OAKTIMBER

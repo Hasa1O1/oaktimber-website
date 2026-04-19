@@ -97,16 +97,13 @@ function About() {
         <div className="container-custom">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             
-            {/* Left side - Image placeholder */}
+            {/* Left side - CEO Image */}
             <div className="relative">
-              <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary-300 to-primary-600 shadow-xl flex items-center justify-center">
-                <div className="text-center text-white p-8">
-                  <p className="text-xl font-semibold mb-2">Business Owner Photo</p>
-                  <p className="text-sm opacity-90">
-                    Photo of Dingani Leonard Peleka or workshop
-                  </p>
-                </div>
-              </div>
+              <img 
+                src="/images/CEO image.png" 
+                alt="Dingani Leonard Peleka - CEO of OAKTIMBER" 
+                className="w-full aspect-square object-cover rounded-2xl shadow-xl"
+              />
               {/* Decorative element */}
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-400 rounded-2xl opacity-20 -z-10"></div>
             </div>
