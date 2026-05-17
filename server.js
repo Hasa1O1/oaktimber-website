@@ -6,9 +6,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const distPath = path.join(__dirname, 'dist');
+const indexPath = path.join(distPath, 'index.html');
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'dist'), {
+app.use(express.static(distPath, {
   setHeaders: (res, filePath) => {
     // Set proper content types
     if (filePath.endsWith('.html')) {
@@ -25,7 +27,7 @@ app.use(express.static(path.join(__dirname, 'dist'), {
 // match one above, send back React's index.html file.
 // This handles React Router routes properly.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'), {
+  res.sendFile(indexPath, {
     headers: {
       'Content-Type': 'text/html',
       'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -36,5 +38,5 @@ app.get('*', (req, res) => {
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-  console.log(`Serving static files from ${path.join(__dirname, 'dist')}`);
+  console.log(`Serving static files from ${distPath}`);
 });
