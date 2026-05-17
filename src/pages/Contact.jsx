@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { FaPhone, FaEnvelope, FaWhatsapp, FaClock, FaUser, FaSms, FaTimes } from 'react-icons/fa'
+import EditableText from '../components/EditableText'
 
 /**
  * Contact Page Component
@@ -135,10 +136,15 @@ Requested via OAKTIMBER website.`
       <section className="bg-gradient-to-br from-primary-100 to-accent-cream section-padding">
         <div className="container-custom text-center">
           <h1 className="text-primary-900 mb-6 animate-fade-in">
-            Get in Touch
+            <EditableText page="contact" section="page_title" defaultValue="Get in Touch" />
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            Have a project in mind? We'd love to hear from you. Fill out the form below or reach out directly.
+            <EditableText
+              page="contact"
+              section="page_intro"
+              defaultValue="Have a project in mind? We'd love to hear from you. Fill out the form below or reach out directly."
+              multiline
+            />
           </p>
         </div>
       </section>
@@ -151,7 +157,9 @@ Requested via OAKTIMBER website.`
             {/* Contact Form - Takes up 2 columns */}
             <div className="lg:col-span-2">
               <div className="bg-primary-50 rounded-2xl p-8 shadow-lg">
-                <h2 className="text-primary-900 mb-6">Send Us a Message</h2>
+                <h2 className="text-primary-900 mb-6">
+                  <EditableText page="contact" section="form_title" defaultValue="Send Us a Message" />
+                </h2>
                 
                 {/* Success message */}
                 {submitStatus === 'success' && (
@@ -277,7 +285,9 @@ Requested via OAKTIMBER website.`
               
               {/* Contact details card */}
               <div className="card p-6 space-y-6">
-                <h3 className="text-xl font-semibold text-primary-800">Contact Information</h3>
+                <h3 className="text-xl font-semibold text-primary-800">
+                  <EditableText page="contact" section="contact_info_title" defaultValue="Contact Information" />
+                </h3>
                 
                 {/* Phone */}
                 <div className="flex items-start gap-4">
@@ -344,7 +354,9 @@ Requested via OAKTIMBER website.`
                   <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
                     <FaClock className="text-primary-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-primary-800">Business Hours</h3>
+                  <h3 className="text-xl font-semibold text-primary-800">
+                    <EditableText page="contact" section="hours_title" defaultValue="Business Hours" />
+                  </h3>
                 </div>
                 
                 <div className="space-y-2 text-sm">
@@ -365,9 +377,16 @@ Requested via OAKTIMBER website.`
 
               {/* Quick response note */}
               <div className="bg-primary-900 text-white rounded-lg p-6">
-                <h4 className="font-semibold mb-2">Quick Response Guarantee</h4>
+                <h4 className="font-semibold mb-2">
+                  <EditableText page="contact" section="response_title" defaultValue="Quick Response Guarantee" />
+                </h4>
                 <p className="text-sm text-primary-200">
-                  We typically respond to all inquiries within 24 hours during business days.
+                  <EditableText
+                    page="contact"
+                    section="response_text"
+                    defaultValue="We typically respond to all inquiries within 24 hours during business days."
+                    multiline
+                  />
                 </p>
               </div>
             </div>
@@ -379,8 +398,12 @@ Requested via OAKTIMBER website.`
       <section className="section-padding bg-white">
         <div className="container-custom max-w-4xl">
           <div className="text-center mb-12">
-            <h2 className="text-primary-900 mb-4">Frequently Asked Questions</h2>
-            <p className="text-gray-700">Quick answers to common questions</p>
+            <h2 className="text-primary-900 mb-4">
+              <EditableText page="contact" section="faq_title" defaultValue="Frequently Asked Questions" />
+            </h2>
+            <p className="text-gray-700">
+              <EditableText page="contact" section="faq_intro" defaultValue="Quick answers to common questions" />
+            </p>
           </div>
 
           <div className="space-y-6">

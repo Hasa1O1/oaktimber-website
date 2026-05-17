@@ -1,52 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaArrowRight, FaCheck, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import EditableText from '../components/EditableText'
 
-/**
- * Home Page Component
- * 
- * This is the landing page that visitors see first.
- * Contains:
- * - Hero section with main tagline and call-to-action
- * - Business summary and value propositions
- * - Featured products preview
- * - Why choose us section
- * - Call to action section
- */
 function Home() {
-  // State to track which hero image is currently displayed (0, 1, or 2)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-
-  // State to track current image for each product card
   const [productImageIndices, setProductImageIndices] = useState({})
 
-  // Effect to rotate through hero images every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % 3)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [])
-
-  // Function to navigate product images
-  const navigateProductImage = (productId, direction) => {
-    setProductImageIndices(prev => {
-      const currentIndex = prev[productId] || 0
-      const product = featuredProducts.find(p => p.id === productId)
-      const maxIndex = product.images.length - 1
-      
-      let newIndex
-      if (direction === 'next') {
-        newIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1
-      } else {
-        newIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1
-      }
-      
-      return { ...prev, [productId]: newIndex }
-    })
-  }
-
-  // Featured products data for display on home page
   const featuredProducts = [
     {
       id: 1,
@@ -68,7 +28,6 @@ function Home() {
     },
   ]
 
-  // Reasons to choose OAKTIMBER
   const benefits = [
     'Premium quality materials (Maple wood, MDF, Compressed boards)',
     'Skilled craftsmanship with attention to detail',
@@ -78,27 +37,47 @@ function Home() {
     'Timely project completion',
   ]
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % 3)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const navigateProductImage = (productId, direction) => {
+    setProductImageIndices((prev) => {
+      const currentIndex = prev[productId] || 0
+      const product = featuredProducts.find((item) => item.id === productId)
+      const maxIndex = product.images.length - 1
+      const newIndex = direction === 'next'
+        ? currentIndex >= maxIndex ? 0 : currentIndex + 1
+        : currentIndex <= 0 ? maxIndex : currentIndex - 1
+
+      return { ...prev, [productId]: newIndex }
+    })
+  }
+
   return (
     <div className="min-h-screen">
-      
-      {/* Hero Section - First thing visitors see */}
       <section className="relative bg-gradient-to-br from-primary-50 via-accent-cream to-primary-100 section-padding">
         <div className="container-custom">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            
-            {/* Left side - Text content */}
             <div className="space-y-6 animate-fade-in">
               <h1 className="text-primary-900 leading-tight">
-                Crafting Timeless
-                <span className="block text-primary-600">Wooden Masterpieces</span>
+                <EditableText page="home" section="hero_title" defaultValue="Crafting Timeless" />
+                <span className="block text-primary-600">
+                  <EditableText page="home" section="hero_highlight" defaultValue="Wooden Masterpieces" />
+                </span>
               </h1>
               <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                Transform your space with handcrafted furniture and custom installations. 
-                From elegant coffee tables to complete kitchen units, we bring your vision to life 
-                with premium materials and expert craftsmanship.
+                <EditableText
+                  page="home"
+                  section="hero_intro"
+                  defaultValue="Transform your space with handcrafted furniture and custom installations. From elegant coffee tables to complete kitchen units, we bring your vision to life with premium materials and expert craftsmanship."
+                  multiline
+                />
               </p>
-              
-              {/* Call to action buttons */}
+
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link to="/contact" className="btn-primary inline-flex items-center justify-center gap-2">
                   Get a Free Quote
@@ -109,53 +88,47 @@ function Home() {
                 </Link>
               </div>
 
-              {/* Trust indicators */}
               <div className="flex flex-wrap gap-6 pt-6 border-t border-primary-200">
                 <div>
-                  <p className="text-3xl font-bold text-primary-700">100+</p>
-                  <p className="text-sm text-gray-600">Projects Completed</p>
+                  <p className="text-3xl font-bold text-primary-700">
+                    <EditableText page="home" section="stat_projects_value" defaultValue="100+" />
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <EditableText page="home" section="stat_projects_label" defaultValue="Projects Completed" />
+                  </p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-primary-700">50+</p>
-                  <p className="text-sm text-gray-600">Happy Clients</p>
+                  <p className="text-3xl font-bold text-primary-700">
+                    <EditableText page="home" section="stat_clients_value" defaultValue="50+" />
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <EditableText page="home" section="stat_clients_label" defaultValue="Happy Clients" />
+                  </p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-primary-700">5★</p>
-                  <p className="text-sm text-gray-600">Customer Rating</p>
+                  <p className="text-3xl font-bold text-primary-700">
+                    <EditableText page="home" section="stat_rating_value" defaultValue="5 Star" />
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <EditableText page="home" section="stat_rating_label" defaultValue="Customer Rating" />
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Right side - Rotating Hero Cards */}
             <div className="relative animate-slide-in-right h-96">
-              {/* Card 3 - Back card, shows corner only */}
-              <div className={`absolute inset-0 rounded-2xl shadow-lg overflow-hidden transform -rotate-6 translate-y-4 translate-x-4 z-0 transition-opacity duration-700 ${currentImageIndex === 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <img 
-                  src="/images/hero image 3.png" 
-                  alt="OAKTIMBER craftsmanship"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              
-              {/* Card 2 - Middle card, shows corner only */}
-              <div className={`absolute inset-0 rounded-2xl shadow-xl overflow-hidden transform rotate-3 translate-y-2 translate-x-2 z-10 transition-opacity duration-700 ${currentImageIndex === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <img 
-                  src="/images/hero image 2.png" 
-                  alt="OAKTIMBER furniture"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              
-              {/* Card 1 - Front card, fully visible */}
-              <div className={`absolute inset-0 rounded-2xl shadow-2xl overflow-hidden z-20 transition-opacity duration-700 ${currentImageIndex === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <img 
-                  src="/images/hero image 1.jpg" 
-                  alt="OAKTIMBER - Handcrafted wooden furniture and custom installations"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              
-              {/* Decorative elements */}
+              {['/images/hero image 3.png', '/images/hero image 2.png', '/images/hero image 1.jpg'].map((image, index) => (
+                <div
+                  key={image}
+                  className={`absolute inset-0 rounded-2xl overflow-hidden transition-opacity duration-700 ${
+                    index === 0 ? 'shadow-lg transform -rotate-6 translate-y-4 translate-x-4 z-0' : ''
+                  } ${index === 1 ? 'shadow-xl transform rotate-3 translate-y-2 translate-x-2 z-10' : ''} ${
+                    index === 2 ? 'shadow-2xl z-20' : ''
+                  } ${currentImageIndex === (2 - index) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                >
+                  <img src={image} alt="OAKTIMBER craftsmanship" className="w-full h-full object-cover" />
+                </div>
+              ))}
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-600 rounded-2xl opacity-20 -z-10"></div>
               <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary-400 rounded-full opacity-20 -z-10"></div>
             </div>
@@ -163,17 +136,19 @@ function Home() {
         </div>
       </section>
 
-      {/* About Summary Section */}
       <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center space-y-6">
             <h2 className="text-primary-900 animate-slide-up">
-              Welcome to OAKTIMBER
+              <EditableText page="home" section="welcome_title" defaultValue="Welcome to OAKTIMBER" />
             </h2>
             <p className="text-lg text-gray-700 leading-relaxed">
-              We are a dedicated carpentry workshop specializing in the design and manufacture 
-              of premium wooden furniture and custom installations. Every piece we create is 
-              crafted with precision, passion, and a commitment to quality that stands the test of time.
+              <EditableText
+                page="home"
+                section="welcome_text"
+                defaultValue="We are a dedicated carpentry workshop specializing in the design and manufacture of premium wooden furniture and custom installations. Every piece we create is crafted with precision, passion, and a commitment to quality that stands the test of time."
+                multiline
+              />
             </p>
             <Link to="/about" className="inline-flex items-center text-primary-600 font-semibold hover:text-primary-700 gap-2">
               Learn More About Us
@@ -183,38 +158,37 @@ function Home() {
         </div>
       </section>
 
-      {/* Featured Products Section */}
       <section className="section-padding bg-primary-50">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-primary-900 mb-4">Featured Products & Services</h2>
+            <h2 className="text-primary-900 mb-4">
+              <EditableText page="home" section="featured_title" defaultValue="Featured Products & Services" />
+            </h2>
             <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-              Explore our range of handcrafted furniture and professional installation services
+              <EditableText
+                page="home"
+                section="featured_intro"
+                defaultValue="Explore our range of handcrafted furniture and professional installation services"
+                multiline
+              />
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {featuredProducts.map((product) => {
-              const currentImageIndex = productImageIndices[product.id] || 0
-              const currentImage = product.images[currentImageIndex]
+              const imageIndex = productImageIndices[product.id] || 0
+              const currentImage = product.images[imageIndex]
               const hasMultipleImages = product.images.length > 1
-              
+
               return (
                 <div key={product.id} className="card group">
-                  {/* Product image carousel */}
                   <div className="relative aspect-square bg-gray-100 overflow-hidden">
-                    <img 
-                      src={currentImage} 
-                      alt={product.name}
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                    />
-                    
-                    {/* Navigation arrows for multiple images */}
+                    <img src={currentImage} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                     {hasMultipleImages && (
                       <>
                         <button
-                          onClick={(e) => {
-                            e.preventDefault()
+                          onClick={(event) => {
+                            event.preventDefault()
                             navigateProductImage(product.id, 'prev')
                           }}
                           className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -223,8 +197,8 @@ function Home() {
                           <FaChevronLeft className="text-sm" />
                         </button>
                         <button
-                          onClick={(e) => {
-                            e.preventDefault()
+                          onClick={(event) => {
+                            event.preventDefault()
                             navigateProductImage(product.id, 'next')
                           }}
                           className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -232,23 +206,9 @@ function Home() {
                         >
                           <FaChevronRight className="text-sm" />
                         </button>
-                        
-                        {/* Image indicators */}
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
-                          {product.images.map((_, index) => (
-                            <div
-                              key={index}
-                              className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                                index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                              }`}
-                            />
-                          ))}
-                        </div>
                       </>
                     )}
                   </div>
-                  
-                  {/* Product details */}
                   <div className="p-6 space-y-3">
                     <h3 className="text-primary-800 group-hover:text-primary-600 transition-colors">
                       {product.name}
@@ -256,10 +216,7 @@ function Home() {
                     <p className="text-gray-600">
                       {product.description}
                     </p>
-                    <Link 
-                      to="/products" 
-                      className="inline-flex items-center text-primary-600 font-medium hover:text-primary-700 gap-2"
-                    >
+                    <Link to="/products" className="inline-flex items-center text-primary-600 font-medium hover:text-primary-700 gap-2">
                       Learn More
                       <FaArrowRight className="text-xs" />
                     </Link>
@@ -278,32 +235,26 @@ function Home() {
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
       <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            
-            {/* Left side - Why Choose Us Image */}
             <div className="relative">
-              <img 
-                src="/images/why choose us image..jpg" 
-                alt="OAKTIMBER workshop and craftsmanship"
-                className="w-full aspect-square object-cover rounded-2xl shadow-xl"
-              />
-              {/* Decorative element */}
+              <img src="/images/why choose us image..jpg" alt="OAKTIMBER workshop and craftsmanship" className="w-full aspect-square object-cover rounded-2xl shadow-xl" />
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-400 rounded-2xl opacity-20 -z-10"></div>
             </div>
 
-            {/* Right side - Benefits list */}
             <div className="space-y-6">
               <h2 className="text-primary-900">
-                Why Choose OAKTIMBER?
+                <EditableText page="home" section="why_title" defaultValue="Why Choose OAKTIMBER?" />
               </h2>
               <p className="text-gray-700 text-lg">
-                We combine traditional craftsmanship with modern design to deliver furniture 
-                that's built to last and beautiful to behold.
+                <EditableText
+                  page="home"
+                  section="why_intro"
+                  defaultValue="We combine traditional craftsmanship with modern design to deliver furniture that's built to last and beautiful to behold."
+                  multiline
+                />
               </p>
-              
               <ul className="space-y-4">
                 {benefits.map((benefit, index) => (
                   <li key={index} className="flex items-start gap-3">
@@ -321,28 +272,25 @@ function Home() {
         </div>
       </section>
 
-      {/* Final Call to Action Section */}
       <section className="section-padding bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="container-custom text-center">
           <h2 className="text-white mb-6">
-            Ready to Transform Your Space?
+            <EditableText page="home" section="cta_title" defaultValue="Ready to Transform Your Space?" />
           </h2>
           <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-            Let's bring your vision to life with custom furniture and professional installations. 
-            Get in touch today for a free consultation and quote.
+            <EditableText
+              page="home"
+              section="cta_text"
+              defaultValue="Let's bring your vision to life with custom furniture and professional installations. Get in touch today for a free consultation and quote."
+              multiline
+            />
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              to="/contact" 
-              className="px-8 py-4 bg-white text-primary-700 font-semibold rounded-lg hover:bg-primary-50 transition-all duration-300 shadow-lg hover:shadow-xl inline-flex items-center justify-center gap-2"
-            >
+            <Link to="/contact" className="px-8 py-4 bg-white text-primary-700 font-semibold rounded-lg hover:bg-primary-50 transition-all duration-300 shadow-lg hover:shadow-xl inline-flex items-center justify-center gap-2">
               Contact Us Now
               <FaArrowRight />
             </Link>
-            <Link 
-              to="/gallery" 
-              className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary-700 transition-all duration-300 inline-flex items-center justify-center"
-            >
+            <Link to="/gallery" className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary-700 transition-all duration-300 inline-flex items-center justify-center">
               View Gallery
             </Link>
           </div>
@@ -353,4 +301,3 @@ function Home() {
 }
 
 export default Home
-

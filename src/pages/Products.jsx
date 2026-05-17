@@ -1,42 +1,20 @@
 import React, { useState } from 'react'
-import { FaCheck, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTrash } from 'react-icons/fa'
+import { toast } from 'react-hot-toast'
+import EditableText from '../components/EditableText'
+import CardModal from '../components/CardModal'
+import useAdminMode from '../hooks/useAdminMode'
+import { useCards } from '../hooks/useCards'
+import { defaultProductCards } from '../data/cards'
 
-/**
- * Products & Services Page Component
- * 
- * Displays all products and services offered by OAKTIMBER
- * Contains:
- * - Product categories and gallery
- * - Service descriptions
- * - Filterable product display
- * - Request quote section
- */
 function Products() {
-  // State to track active category filter
+  const { isAdmin } = useAdminMode()
+  const { cards: products, createCard, updateCard, deleteCard } = useCards('products', defaultProductCards)
   const [activeCategory, setActiveCategory] = useState('all')
-
-  // State to track current image for each product card
   const [productImageIndices, setProductImageIndices] = useState({})
+  const [editingCard, setEditingCard] = useState(null)
+  const [isCardModalOpen, setIsCardModalOpen] = useState(false)
 
-  // Function to navigate product images
-  const navigateProductImage = (productId, direction) => {
-    setProductImageIndices(prev => {
-      const currentIndex = prev[productId] || 0
-      const product = products.find(p => p.id === productId)
-      const maxIndex = product.images ? product.images.length - 1 : 0
-      
-      let newIndex
-      if (direction === 'next') {
-        newIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1
-      } else {
-        newIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1
-      }
-      
-      return { ...prev, [productId]: newIndex }
-    })
-  }
-
-  // Product categories for filtering
   const categories = [
     { id: 'all', name: 'All Products' },
     { id: 'furniture', name: 'Furniture' },
@@ -44,112 +22,75 @@ function Products() {
     { id: 'services', name: 'Services' },
   ]
 
-  // Products and services data
-  const products = [
-    {
-      id: 1,
-      name: 'Coffee Tables',
-      category: 'furniture',
-      description: 'Handcrafted coffee tables in various sizes and styles. Perfect centerpiece for your living room.',
-      features: ['Custom sizes available', 'Multiple wood finishes', 'Durable construction', 'Modern & classic designs'],
-      images: ['/images/Coffee Table.png'],
-    },
-    {
-      id: 2,
-      name: 'Book Shelves',
-      category: 'furniture',
-      description: 'Functional and elegant book shelves designed for organizing and displaying your collection.',
-      features: ['Customizable dimensions', 'Multiple wood finishes', 'Wall-mounted or freestanding', 'Durable construction'],
-      images: ['/images/Book Shelves 1.png', '/images/Book Shelves 2.png'],
-    },
-    {
-      id: 3,
-      name: 'Chairs & Stools',
-      category: 'furniture',
-      description: 'Comfortable seating solutions from dining chairs to bar stools.',
-      features: ['Comfortable seating', 'Sturdy construction', 'Various styles', 'Custom upholstery available'],
-      images: ['/images/Chairs and Stools.png'],
-    },
-    {
-      id: 4,
-      name: 'Benches',
-      category: 'furniture',
-      description: 'Versatile benches for indoor and outdoor use, combining style with functionality.',
-      features: ['Indoor & outdoor options', 'Custom lengths', 'Storage bench options', 'Weather-resistant finishes'],
-      images: ['/images/Benches.png'],
-    },
-    {
-      id: 5,
-      name: 'Kitchen Units',
-      category: 'installations',
-      description: 'Complete kitchen cabinet systems designed and installed to maximize your space.',
-      features: ['Custom design', 'Quality hardware', 'Professional installation', 'Durable finishes'],
-      images: ['/images/Kitchen Unit.png'],
-    },
-    {
-      id: 6,
-      name: 'TV Stands',
-      category: 'installations',
-      description: 'Wall-mounted and floor-standing TV units with integrated storage solutions.',
-      features: ['Cable management', 'Storage compartments', 'Wall mounting available', 'Custom sizing'],
-      images: ['/images/TV Stand.png'],
-      price: 'K2,500',
-    },
-    {
-      id: 7,
-      name: 'Curtain Rod Installation',
-      category: 'services',
-      description: 'Professional installation of curtain rods and window treatment hardware.',
-      features: ['Precise measurements', 'Secure mounting', 'All window types', 'Hardware included'],
-      images: ['/images/curtain-rods.jpg'],
-    },
-    {
-      id: 8,
-      name: 'Wall Art Pieces',
-      category: 'installations',
-      description: 'Custom wooden wall art and decorative installations to enhance your space.',
-      features: ['Custom designs', 'Unique pieces', 'Professional mounting', 'Various sizes'],
-      images: ['/images/wall-art.jpg'],
-    },
-    {
-      id: 9,
-      name: 'Shelves',
-      category: 'installations',
-      description: 'Custom-built shelves and storage solutions designed to maximize your space.',
-      features: ['Custom sizing', 'Various materials', 'Wall-mounted or freestanding', 'Professional installation'],
-      images: ['/images/Shelves.png'],
-    },
-    {
-      id: 10,
-      name: 'Drilling Services',
-      category: 'services',
-      description: 'Professional drilling and mounting services for all your installation needs.',
-      features: ['All surface types', 'Precise drilling', 'Clean work', 'Quick service'],
-      images: ['/images/drilling.jpg'],
-    },
-  ]
+  const filteredProducts = activeCategory === 'all'
+    ? products
+    : products.filter((product) => product.category === activeCategory)
 
-  // Filter products based on active category
-  const filteredProducts = activeCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === activeCategory)
+  const navigateProductImage = (productId, direction) => {
+    setProductImageIndices((prev) => {
+      const currentIndex = prev[productId] || 0
+      const product = products.find((item) => item.id === productId)
+      const maxIndex = product?.images?.length ? product.images.length - 1 : 0
+
+      const newIndex = direction === 'next'
+        ? currentIndex >= maxIndex ? 0 : currentIndex + 1
+        : currentIndex <= 0 ? maxIndex : currentIndex - 1
+
+      return { ...prev, [productId]: newIndex }
+    })
+  }
+
+  function openCreateModal() {
+    setEditingCard(null)
+    setIsCardModalOpen(true)
+  }
+
+  function openEditModal(card) {
+    setEditingCard(card)
+    setIsCardModalOpen(true)
+  }
+
+  async function handleSaveCard(input) {
+    try {
+      if (editingCard) {
+        await updateCard(editingCard.id, input)
+      } else {
+        await createCard(input)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  async function handleDeleteCard(card) {
+    const confirmed = window.confirm(`Delete "${card.title || card.name}"?`)
+    if (!confirmed) return
+
+    try {
+      await deleteCard(card.id)
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
 
   return (
     <div className="min-h-screen">
-      
-      {/* Page Header */}
       <section className="bg-gradient-to-br from-primary-100 to-accent-cream section-padding">
         <div className="container-custom text-center">
           <h1 className="text-primary-900 mb-6 animate-fade-in">
-            Products & Services
+            <EditableText page="products" section="page_title" defaultValue="Products & Services" />
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            Discover our range of handcrafted furniture and professional installation services
+            <EditableText
+              page="products"
+              section="page_intro"
+              defaultValue="Discover our range of handcrafted furniture and professional installation services"
+              multiline
+            />
           </p>
         </div>
       </section>
 
-      {/* Category Filter */}
       <section className="bg-white py-8 sticky top-20 z-40 shadow-sm">
         <div className="container-custom">
           <div className="flex flex-wrap justify-center gap-4">
@@ -170,27 +111,58 @@ function Products() {
         </div>
       </section>
 
-      {/* Products Grid */}
       <section className="section-padding bg-accent-cream">
         <div className="container-custom">
+          {isAdmin && (
+            <div className="mb-8 flex justify-end">
+              <button
+                type="button"
+                onClick={openCreateModal}
+                className="btn-primary inline-flex items-center gap-2"
+              >
+                <FaPlus />
+                Add Product Card
+              </button>
+            </div>
+          )}
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProducts.map((product) => {
               const currentImageIndex = productImageIndices[product.id] || 0
-              const currentImage = product.images ? product.images[currentImageIndex] : null
+              const currentImage = product.images ? product.images[currentImageIndex] : product.image_url
               const hasMultipleImages = product.images && product.images.length > 1
-              
+
               return (
-                <div key={product.id} className="card animate-fade-in group">
-                  {/* Product image carousel */}
+                <div key={product.id} className="card animate-fade-in group relative">
+                  {isAdmin && (
+                    <div className="absolute right-3 top-3 z-30 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(product)}
+                        className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg hover:bg-primary-700"
+                        aria-label="Edit product card"
+                      >
+                        <FaPencilAlt className="text-sm" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCard(product)}
+                        className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700"
+                        aria-label="Delete product card"
+                      >
+                        <FaTrash className="text-sm" />
+                      </button>
+                    </div>
+                  )}
+
                   {currentImage ? (
                     <div className="relative aspect-square bg-gray-100 overflow-hidden">
-                      <img 
-                        src={currentImage} 
-                        alt={product.name}
+                      <img
+                        src={currentImage}
+                        alt={product.title || product.name}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                       />
-                      
-                      {/* Navigation arrows for multiple images */}
+
                       {hasMultipleImages && (
                         <>
                           <button
@@ -213,8 +185,6 @@ function Products() {
                           >
                             <FaChevronRight className="text-sm" />
                           </button>
-                          
-                          {/* Image indicators */}
                           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
                             {product.images.map((_, index) => (
                               <div
@@ -231,17 +201,16 @@ function Products() {
                   ) : (
                     <div className="aspect-square bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
                       <div className="text-center text-white p-4">
-                        <p className="font-semibold">{product.name}</p>
+                        <p className="font-semibold">{product.title || product.name}</p>
                         <p className="text-sm opacity-90 mt-1">Product Image</p>
                       </div>
                     </div>
                   )}
-                  
-                  {/* Product details */}
+
                   <div className="p-6 space-y-4">
                     <div className="flex items-start justify-between">
                       <h3 className="text-primary-800">
-                        {product.name}
+                        {product.title || product.name}
                       </h3>
                       {product.price && (
                         <span className="text-xl font-bold text-primary-600">
@@ -252,10 +221,9 @@ function Products() {
                     <p className="text-gray-600">
                       {product.description}
                     </p>
-                    
-                    {/* Features list */}
+
                     <ul className="space-y-2">
-                      {product.features.map((feature, index) => (
+                      {(product.features || []).map((feature, index) => (
                         <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
                           <div className="mt-1 flex-shrink-0">
                             <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
@@ -272,7 +240,6 @@ function Products() {
             })}
           </div>
 
-          {/* No results message */}
           {filteredProducts.length === 0 && (
             <div className="text-center py-12">
               <p className="text-xl text-gray-600">No products found in this category.</p>
@@ -281,102 +248,97 @@ function Products() {
         </div>
       </section>
 
-      {/* Additional Services Section */}
       <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-primary-900 mb-4">Additional Services</h2>
+              <h2 className="text-primary-900 mb-4">
+                <EditableText page="products" section="additional_services_title" defaultValue="Additional Services" />
+              </h2>
               <p className="text-lg text-gray-700">
-                Beyond our standard offerings, we provide comprehensive carpentry solutions
+                <EditableText
+                  page="products"
+                  section="additional_services_intro"
+                  defaultValue="Beyond our standard offerings, we provide comprehensive carpentry solutions"
+                  multiline
+                />
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-primary-50 rounded-lg p-6 space-y-3">
-                <h3 className="text-xl font-semibold text-primary-800">Custom Design</h3>
-                <p className="text-gray-700">
-                  Have a unique vision? We specialize in custom furniture design tailored to your 
-                  specific requirements, space, and style preferences. From initial sketch to final installation, 
-                  we work closely with you every step of the way.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-lg p-6 space-y-3">
-                <h3 className="text-xl font-semibold text-primary-800">Consultation</h3>
-                <p className="text-gray-700">
-                  Not sure what you need? Schedule a free consultation where we'll assess your space, 
-                  discuss your needs, and provide expert recommendations. We'll help you choose the right 
-                  materials, styles, and solutions for your project.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-lg p-6 space-y-3">
-                <h3 className="text-xl font-semibold text-primary-800">Repair & Refinishing</h3>
-                <p className="text-gray-700">
-                  Already have furniture that needs some love? We offer repair and refinishing services 
-                  to restore your wooden furniture to its former glory. From structural repairs to 
-                  complete refinishing, we can help.
-                </p>
-              </div>
-
-              <div className="bg-primary-50 rounded-lg p-6 space-y-3">
-                <h3 className="text-xl font-semibold text-primary-800">Commercial Projects</h3>
-                <p className="text-gray-700">
-                  We work with businesses too! Whether you need office furniture, restaurant seating, 
-                  or retail fixtures, we can handle commercial projects of various scales with the same 
-                  attention to quality and detail.
-                </p>
-              </div>
+              {[
+                ['custom_design', 'Custom Design', 'Have a unique vision? We specialize in custom furniture design tailored to your specific requirements, space, and style preferences. From initial sketch to final installation, we work closely with you every step of the way.'],
+                ['consultation', 'Consultation', "Not sure what you need? Schedule a free consultation where we'll assess your space, discuss your needs, and provide expert recommendations. We'll help you choose the right materials, styles, and solutions for your project."],
+                ['repair', 'Repair & Refinishing', 'Already have furniture that needs some love? We offer repair and refinishing services to restore your wooden furniture to its former glory. From structural repairs to complete refinishing, we can help.'],
+                ['commercial', 'Commercial Projects', 'We work with businesses too! Whether you need office furniture, restaurant seating, or retail fixtures, we can handle commercial projects of various scales with the same attention to quality and detail.'],
+              ].map(([key, title, description]) => (
+                <div key={key} className="bg-primary-50 rounded-lg p-6 space-y-3">
+                  <h3 className="text-xl font-semibold text-primary-800">
+                    <EditableText page="products" section={`${key}_title`} defaultValue={title} />
+                  </h3>
+                  <p className="text-gray-700">
+                    <EditableText page="products" section={`${key}_description`} defaultValue={description} multiline />
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Materials Information */}
       <section className="section-padding bg-primary-900 text-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h2 className="text-white mb-4">Quality Materials</h2>
+            <h2 className="text-white mb-4">
+              <EditableText page="products" section="materials_title" defaultValue="Quality Materials" />
+            </h2>
             <p className="text-primary-200 text-lg">
-              All our products are crafted using premium materials including:
+              <EditableText
+                page="products"
+                section="materials_intro"
+                defaultValue="All our products are crafted using premium materials including:"
+                multiline
+              />
             </p>
             <div className="flex flex-wrap justify-center gap-4 pt-4">
-              <span className="px-6 py-3 bg-primary-800 rounded-full text-primary-100 font-medium">
-                Maple Wood
-              </span>
-              <span className="px-6 py-3 bg-primary-800 rounded-full text-primary-100 font-medium">
-                MDF Boards
-              </span>
-              <span className="px-6 py-3 bg-primary-800 rounded-full text-primary-100 font-medium">
-                Compressed Wood
-              </span>
-              <span className="px-6 py-3 bg-primary-800 rounded-full text-primary-100 font-medium">
-                Quality Hardware
-              </span>
+              {['Maple Wood', 'MDF Boards', 'Compressed Wood', 'Quality Hardware'].map((material) => (
+                <span key={material} className="px-6 py-3 bg-primary-800 rounded-full text-primary-100 font-medium">
+                  {material}
+                </span>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Request Quote CTA */}
       <section className="section-padding bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="container-custom text-center">
           <h2 className="text-white mb-6">
-            Interested in Our Products or Services?
+            <EditableText page="products" section="cta_title" defaultValue="Interested in Our Products or Services?" />
           </h2>
           <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-            Contact us today for a free consultation and quote. We'll help you find the perfect 
-            solution for your needs.
+            <EditableText
+              page="products"
+              section="cta_text"
+              defaultValue="Contact us today for a free consultation and quote. We'll help you find the perfect solution for your needs."
+              multiline
+            />
           </p>
           <a href="/contact" className="btn-primary bg-white text-primary-700 hover:bg-primary-50">
             Request a Quote
           </a>
         </div>
       </section>
+
+      <CardModal
+        page="products"
+        card={editingCard}
+        isOpen={isCardModalOpen}
+        onClose={() => setIsCardModalOpen(false)}
+        onSave={handleSaveCard}
+      />
     </div>
   )
 }
 
 export default Products
-

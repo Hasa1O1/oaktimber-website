@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { FaBars, FaTimes } from 'react-icons/fa'
+import { FaBars, FaSignOutAlt, FaTimes } from 'react-icons/fa'
+import { toast } from 'react-hot-toast'
+import useAdminMode from '../../hooks/useAdminMode'
 
 /**
  * Header component with navigation menu
@@ -18,14 +20,27 @@ function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   // Get current location to highlight active page
   const location = useLocation()
+  const { isAdmin, supabase } = useAdminMode()
 
   // Navigation menu items
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Products & Services', path: '/products' },
+    { name: 'Gallery', path: '/gallery' },
     { name: 'Contact', path: '/contact' },
   ]
+
+  const handleLogout = async () => {
+    if (!supabase) return
+
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      toast.error(error.message)
+      return
+    }
+    toast.success('Logged out')
+  }
 
   // Handle scroll effect - change header style when scrolled
   useEffect(() => {
@@ -86,6 +101,16 @@ function Header() {
             <Link to="/contact" className="btn-primary">
               Get a Quote
             </Link>
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-red-700"
+              >
+                <FaSignOutAlt />
+                Logout
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -118,6 +143,16 @@ function Header() {
               <Link to="/contact" className="btn-primary mx-4">
                 Get a Quote
               </Link>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="mx-4 inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-red-700"
+                >
+                  <FaSignOutAlt />
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         )}

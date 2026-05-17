@@ -1,12 +1,16 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import ScrollToTop from './components/ScrollToTop'
+import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
 import About from './pages/About'
 import Products from './pages/Products'
 import Contact from './pages/Contact'
+import Gallery from './pages/Gallery'
+import AdminLogin from './pages/AdminLogin'
 
 /**
  * Main App component that handles routing and layout structure
@@ -19,6 +23,7 @@ import Contact from './pages/Contact'
 function App() {
   return (
     <Router>
+      <Toaster position="top-right" />
       {/* Scroll to top on route change */}
       <ScrollToTop />
       
@@ -33,7 +38,17 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/gallery" element={<Gallery />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route
+              path="/admin/preview"
+              element={(
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              )}
+            />
           </Routes>
         </main>
         
