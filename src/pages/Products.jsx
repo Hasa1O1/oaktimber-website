@@ -3,6 +3,7 @@ import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTrash } 
 import { toast } from 'react-hot-toast'
 import EditableText from '../components/EditableText'
 import CardModal from '../components/CardModal'
+import ConfirmModal from '../components/ConfirmModal'
 import useAdminMode from '../hooks/useAdminMode'
 import { useCards } from '../hooks/useCards'
 import { defaultProductCards } from '../data/cards'
@@ -13,7 +14,9 @@ function Products() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [productImageIndices, setProductImageIndices] = useState({})
   const [editingCard, setEditingCard] = useState(null)
+  const [deletingCard, setDeletingCard] = useState(null)
   const [isCardModalOpen, setIsCardModalOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const categories = [
     { id: 'all', name: 'All Products' },
@@ -62,14 +65,16 @@ function Products() {
     }
   }
 
-  async function handleDeleteCard(card) {
-    const confirmed = window.confirm(`Delete "${card.title || card.name}"?`)
-    if (!confirmed) return
-
+  async function handleConfirmDelete() {
+    if (!deletingCard) return
+    setIsDeleting(true)
     try {
-      await deleteCard(card.id)
+      await deleteCard(deletingCard.id)
+      setDeletingCard(null)
     } catch (error) {
       toast.error(error.message)
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -146,7 +151,7 @@ function Products() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDeleteCard(product)}
+                        onClick={() => setDeletingCard(product)}
                         className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700"
                         aria-label="Delete product card"
                       >
@@ -336,6 +341,18 @@ function Products() {
         isOpen={isCardModalOpen}
         onClose={() => setIsCardModalOpen(false)}
         onSave={handleSaveCard}
+      />
+      <ConfirmModal
+        isOpen={Boolean(deletingCard)}
+        title="Delete Product Card?"
+        message={`This will permanently delete "${deletingCard?.title || deletingCard?.name || 'this card'}" from the website. This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        loading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          if (!isDeleting) setDeletingCard(null)
+        }}
       />
     </div>
   )

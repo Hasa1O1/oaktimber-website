@@ -29,9 +29,10 @@ function normalizeCard(card) {
 }
 
 export function useCards(page, fallbackCards = []) {
-  const { supabase, isSupabaseConfigured } = useAdminMode()
+  const { supabase, isSupabaseConfigured, isAdmin } = useAdminMode()
   const [cards, setCards] = useState(fallbackCards)
   const [loading, setLoading] = useState(isSupabaseConfigured)
+  const [hasSeededDefaults, setHasSeededDefaults] = useState(false)
 
   const fallback = useMemo(() => fallbackCards, [fallbackCards])
 
@@ -61,6 +62,37 @@ export function useCards(page, fallbackCards = []) {
         return
       }
 
+      if (!data.length && isAdmin && fallback.length && !hasSeededDefaults) {
+        setHasSeededDefaults(true)
+        const rows = fallback.map((card, index) => ({
+          page,
+          category: card.category || null,
+          title: card.title || card.name,
+          description: card.description || '',
+          features: card.features || [],
+          image_url: card.image_url || card.images?.[0] || null,
+          order: card.order || index + 1,
+        }))
+
+        const { data: inserted, error: insertError } = await supabase
+          .from('cards')
+          .insert(rows)
+          .select('*')
+
+        if (!mounted) return
+
+        if (insertError) {
+          console.error(insertError)
+          setCards(fallback)
+          setLoading(false)
+          return
+        }
+
+        setCards(inserted.map(normalizeCard))
+        setLoading(false)
+        return
+      }
+
       setCards(data.length ? data.map(normalizeCard) : fallback)
       setLoading(false)
     }
@@ -80,7 +112,7 @@ export function useCards(page, fallbackCards = []) {
       mounted = false
       supabase.removeChannel(channel)
     }
-  }, [fallback, page, supabase])
+  }, [fallback, hasSeededDefaults, isAdmin, page, supabase])
 
   async function createCard(input) {
     if (!supabase) return
@@ -125,12 +157,6 @@ export function useCards(page, fallbackCards = []) {
 
   async function deleteCard(id) {
     if (!supabase) return
-
-    if (typeof id !== 'string') {
-      setCards((current) => current.filter((card) => card.id !== id))
-      toast.success('Default card hidden for this session')
-      return
-    }
 
     const { error } = await supabase
       .from('cards')

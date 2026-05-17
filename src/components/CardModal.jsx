@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FaPlus, FaTimes, FaTrash } from 'react-icons/fa'
+import { FaImage, FaPlus, FaTimes, FaTrash, FaUpload } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import useAdminMode from '../hooks/useAdminMode'
 
@@ -15,6 +15,7 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
   const { supabase } = useAdminMode()
   const [formData, setFormData] = useState(emptyForm)
   const [uploading, setUploading] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!isOpen) return
@@ -82,15 +83,29 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
     toast.success('Image uploaded')
   }
 
+  async function handleRemoveImage() {
+    setFormData((current) => ({
+      ...current,
+      image_url: '',
+    }))
+    toast.success('Image removed from card')
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
 
-    await onSave({
-      ...formData,
-      features: formData.features.map((feature) => feature.trim()).filter(Boolean),
-    })
+    setSaving(true)
+    try {
+      await onSave({
+        ...formData,
+        image_url: formData.image_url || null,
+        features: formData.features.map((feature) => feature.trim()).filter(Boolean),
+      })
 
-    onClose()
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -116,7 +131,7 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
 
         <div className="flex-1 space-y-5 overflow-y-auto p-5">
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Title</label>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Title / Name</label>
             <input
               type="text"
               value={formData.title}
@@ -127,7 +142,7 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Description</label>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Details / Paragraph Text</label>
             <textarea
               value={formData.description}
               onChange={(event) => setFormData((current) => ({ ...current, description: event.target.value }))}
@@ -154,7 +169,7 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
 
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">Features</label>
+              <label className="block text-sm font-medium text-gray-700">Features / List Text</label>
               <button
                 type="button"
                 onClick={addFeature}
@@ -187,30 +202,42 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Image URL</label>
-            <input
-              type="url"
-              value={formData.image_url}
-              onChange={(event) => setFormData((current) => ({ ...current, image_url: event.target.value }))}
-              className="w-full rounded-lg border border-primary-200 px-4 py-3 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Upload Image</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleUpload}
-              className="w-full rounded-lg border border-primary-200 px-4 py-3"
-            />
+            <label className="mb-2 block text-sm font-medium text-gray-700">Picture</label>
+            <label className="flex cursor-pointer items-center justify-center gap-3 rounded-lg border-2 border-dashed border-primary-200 bg-primary-50 px-4 py-6 text-primary-700 transition-colors hover:bg-primary-100">
+              <FaUpload />
+              <span className="font-semibold">{formData.image_url ? 'Upload Replacement Picture' : 'Upload Picture'}</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleUpload}
+                className="hidden"
+              />
+            </label>
             {uploading && <p className="mt-2 text-sm text-gray-600">Uploading...</p>}
             {formData.image_url && (
-              <img
-                src={formData.image_url}
-                alt="Card preview"
-                className="mt-4 h-40 w-full rounded-lg bg-gray-100 object-contain"
-              />
+              <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
+                <img
+                  src={formData.image_url}
+                  alt="Card preview"
+                  className="h-48 w-full rounded-lg bg-gray-100 object-contain"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="mt-3 inline-flex items-center gap-2 rounded-lg bg-red-100 px-4 py-2 font-semibold text-red-700 hover:bg-red-200"
+                >
+                  <FaTrash className="text-sm" />
+                  Delete Picture
+                </button>
+              </div>
+            )}
+            {!formData.image_url && (
+              <div className="mt-4 flex h-32 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                <div className="text-center">
+                  <FaImage className="mx-auto mb-2 text-2xl" />
+                  <p className="text-sm">No picture selected</p>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -223,8 +250,8 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
           >
             Cancel
           </button>
-          <button type="submit" className="btn-primary">
-            Save
+          <button type="submit" disabled={saving || uploading} className="btn-primary disabled:opacity-60">
+            {saving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>
