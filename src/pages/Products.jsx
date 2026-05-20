@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTimes, FaTrash } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import EditableText from '../components/EditableText'
@@ -18,6 +18,8 @@ function Products() {
   const [expandedCard, setExpandedCard] = useState(null)
   const [isCardModalOpen, setIsCardModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [overflowingCards, setOverflowingCards] = useState({})
+  const cardTextRefs = useRef({})
 
   const categories = [
     { id: 'all', name: 'All Products' },
@@ -26,9 +28,34 @@ function Products() {
     { id: 'services', name: 'Services' },
   ]
 
-  const filteredProducts = activeCategory === 'all'
-    ? products
-    : products.filter((product) => product.category === activeCategory)
+  const filteredProducts = useMemo(() => (
+    activeCategory === 'all'
+      ? products
+      : products.filter((product) => product.category === activeCategory)
+  ), [activeCategory, products])
+
+  useEffect(() => {
+    const measureOverflow = () => {
+      const nextOverflowingCards = {}
+
+      filteredProducts.forEach((product) => {
+        const element = cardTextRefs.current[product.id]
+        if (!element) return
+
+        nextOverflowingCards[product.id] = element.scrollHeight > element.clientHeight + 1
+      })
+
+      setOverflowingCards(nextOverflowingCards)
+    }
+
+    const frame = requestAnimationFrame(measureOverflow)
+    window.addEventListener('resize', measureOverflow)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('resize', measureOverflow)
+    }
+  }, [filteredProducts])
 
   const navigateProductImage = (productId, direction) => {
     setProductImageIndices((prev) => {
@@ -205,7 +232,7 @@ function Products() {
                       )}
                     </div>
                   ) : (
-                    <div className="aspect-square bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
+                    <div className="h-64 flex-shrink-0 bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
                       <div className="text-center text-white p-4">
                         <p className="font-semibold">{product.title || product.name}</p>
                         <p className="text-sm opacity-90 mt-1">Product Image</p>
@@ -214,42 +241,51 @@ function Products() {
                   )}
 
                   <div className="flex min-h-0 flex-1 flex-col p-6">
-                    <div className="flex items-start justify-between">
-                      <h3 className="text-primary-800 line-clamp-2">
-                        {product.title || product.name}
-                      </h3>
-                      {product.price && (
-                        <span className="text-xl font-bold text-primary-600">
-                          {product.price}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-3 text-gray-600 line-clamp-3">
-                      {product.description}
-                    </p>
+                    <div
+                      ref={(element) => {
+                        cardTextRefs.current[product.id] = element
+                      }}
+                      className="h-[248px] overflow-hidden"
+                    >
+                      <div className="flex items-start justify-between">
+                        <h3 className="text-primary-800">
+                          {product.title || product.name}
+                        </h3>
+                        {product.price && (
+                          <span className="text-xl font-bold text-primary-600">
+                            {product.price}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-3 text-gray-600">
+                        {product.description}
+                      </p>
 
-                    <ul className="mt-4 space-y-2">
-                      {(product.features || []).slice(0, 3).map((feature, index) => (
-                        <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
-                          <div className="mt-1 flex-shrink-0">
-                            <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
-                              <FaCheck className="text-primary-600 text-xs" />
+                      <ul className="mt-4 space-y-2">
+                        {(product.features || []).map((feature, index) => (
+                          <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                            <div className="mt-1 flex-shrink-0">
+                              <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
+                                <FaCheck className="text-primary-600 text-xs" />
+                              </div>
                             </div>
-                          </div>
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="mt-auto pt-4">
-                      <button
-                        type="button"
-                        onClick={() => setExpandedCard(product)}
-                        className="font-semibold text-primary-600 hover:text-primary-700"
-                      >
-                        Read More
-                      </button>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
+
+                    {overflowingCards[product.id] && (
+                      <div className="mt-auto pt-4">
+                        <button
+                          type="button"
+                          onClick={() => setExpandedCard(product)}
+                          className="font-semibold text-primary-600 hover:text-primary-700"
+                        >
+                          Read More
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )
