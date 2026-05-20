@@ -18,11 +18,36 @@ function normalizeFeatures(features) {
   return []
 }
 
+function normalizeImages(card) {
+  if (Array.isArray(card.image_urls) && card.image_urls.length) {
+    return card.image_urls.filter(Boolean)
+  }
+
+  if (typeof card.image_urls === 'string') {
+    try {
+      const parsed = JSON.parse(card.image_urls)
+      if (Array.isArray(parsed) && parsed.length) {
+        return parsed.filter(Boolean)
+      }
+    } catch {
+      return []
+    }
+  }
+
+  if (card.image_url) return [card.image_url]
+  if (Array.isArray(card.images)) return card.images.filter(Boolean)
+  return []
+}
+
 function normalizeCard(card) {
+  const images = normalizeImages(card)
+
   return {
     ...card,
     name: card.title,
-    images: card.image_url ? [card.image_url] : [],
+    image_url: images[0] || null,
+    image_urls: images,
+    images,
     features: normalizeFeatures(card.features),
     order: Number.isFinite(card.order) ? card.order : 0,
   }
@@ -71,6 +96,7 @@ export function useCards(page, fallbackCards = []) {
           description: card.description || '',
           features: card.features || [],
           image_url: card.image_url || card.images?.[0] || null,
+          image_urls: card.images?.length ? card.images : card.image_url ? [card.image_url] : [],
           order: card.order || index + 1,
         }))
 
@@ -123,7 +149,8 @@ export function useCards(page, fallbackCards = []) {
       title: input.title,
       description: input.description,
       features: input.features,
-      image_url: input.image_url,
+      image_url: input.image_urls?.[0] || input.image_url || null,
+      image_urls: input.image_urls || [],
       category: input.category || null,
       order: maxOrder + 1,
     })
@@ -146,7 +173,8 @@ export function useCards(page, fallbackCards = []) {
         title: input.title,
         description: input.description,
         features: input.features,
-        image_url: input.image_url,
+        image_url: input.image_urls?.[0] || input.image_url || null,
+        image_urls: input.image_urls || [],
         category: input.category || null,
       })
       .eq('id', id)

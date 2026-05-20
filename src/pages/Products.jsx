@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTrash } from 'react-icons/fa'
+import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTimes, FaTrash } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import EditableText from '../components/EditableText'
 import CardModal from '../components/CardModal'
@@ -15,6 +15,7 @@ function Products() {
   const [productImageIndices, setProductImageIndices] = useState({})
   const [editingCard, setEditingCard] = useState(null)
   const [deletingCard, setDeletingCard] = useState(null)
+  const [expandedCard, setExpandedCard] = useState(null)
   const [isCardModalOpen, setIsCardModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -138,7 +139,7 @@ function Products() {
               const hasMultipleImages = product.images && product.images.length > 1
 
               return (
-                <div key={product.id} className="card animate-fade-in group relative">
+                <div key={product.id} className="card animate-fade-in group relative flex h-[620px] flex-col">
                   {isAdmin && (
                     <div className="absolute right-3 top-3 z-30 flex gap-2">
                       <button
@@ -161,7 +162,7 @@ function Products() {
                   )}
 
                   {currentImage ? (
-                    <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                    <div className="relative h-64 flex-shrink-0 bg-gray-100 overflow-hidden">
                       <img
                         src={currentImage}
                         alt={product.title || product.name}
@@ -212,9 +213,9 @@ function Products() {
                     </div>
                   )}
 
-                  <div className="p-6 space-y-4">
+                  <div className="flex min-h-0 flex-1 flex-col p-6">
                     <div className="flex items-start justify-between">
-                      <h3 className="text-primary-800">
+                      <h3 className="text-primary-800 line-clamp-2">
                         {product.title || product.name}
                       </h3>
                       {product.price && (
@@ -223,12 +224,12 @@ function Products() {
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-600">
+                    <p className="mt-3 text-gray-600 line-clamp-3">
                       {product.description}
                     </p>
 
-                    <ul className="space-y-2">
-                      {(product.features || []).map((feature, index) => (
+                    <ul className="mt-4 space-y-2">
+                      {(product.features || []).slice(0, 3).map((feature, index) => (
                         <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
                           <div className="mt-1 flex-shrink-0">
                             <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
@@ -239,6 +240,16 @@ function Products() {
                         </li>
                       ))}
                     </ul>
+
+                    <div className="mt-auto pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedCard(product)}
+                        className="font-semibold text-primary-600 hover:text-primary-700"
+                      >
+                        Read More
+                      </button>
+                    </div>
                   </div>
                 </div>
               )
@@ -354,6 +365,47 @@ function Products() {
           if (!isDeleting) setDeletingCard(null)
         }}
       />
+      {expandedCard && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onClick={() => setExpandedCard(null)}>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-gray-200 p-5">
+              <h3 className="text-2xl font-semibold text-primary-900">{expandedCard.title || expandedCard.name}</h3>
+              <button
+                type="button"
+                onClick={() => setExpandedCard(null)}
+                className="rounded-full p-2 text-gray-500 hover:bg-gray-100"
+                aria-label="Close product details"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className="space-y-5 p-5">
+              {expandedCard.images?.[0] && (
+                <img
+                  src={expandedCard.images[0]}
+                  alt={expandedCard.title || expandedCard.name}
+                  className="h-72 w-full rounded-lg bg-gray-100 object-contain"
+                />
+              )}
+              <p className="text-gray-700">{expandedCard.description}</p>
+              {expandedCard.features?.length > 0 && (
+                <ul className="space-y-2">
+                  {expandedCard.features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-2 text-gray-700">
+                      <div className="mt-1 flex-shrink-0">
+                        <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
+                          <FaCheck className="text-primary-600 text-xs" />
+                        </div>
+                      </div>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

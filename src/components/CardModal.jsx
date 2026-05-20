@@ -8,7 +8,7 @@ const emptyForm = {
   description: '',
   category: '',
   features: [''],
-  image_url: '',
+  image_urls: [],
 }
 
 function CardModal({ card, page, isOpen, onClose, onSave }) {
@@ -25,7 +25,7 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
       description: card?.description || '',
       category: card?.category || '',
       features: Array.isArray(card?.features) && card.features.length ? card.features : [''],
-      image_url: card?.image_url || card?.images?.[0] || '',
+      image_urls: card?.image_urls?.length ? card.image_urls : card?.images?.length ? card.images : card?.image_url ? [card.image_url] : [],
     })
   }, [card, isOpen])
 
@@ -55,38 +55,45 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
   }
 
   async function handleUpload(event) {
-    const file = event.target.files?.[0]
-    if (!file || !supabase) return
+    const files = Array.from(event.target.files || [])
+    if (!files.length || !supabase) return
 
     setUploading(true)
-    const extension = file.name.split('.').pop()
-    const filePath = `${page}/${crypto.randomUUID()}.${extension}`
-    const { error } = await supabase.storage
-      .from('card-images')
-      .upload(filePath, file, { upsert: false })
+    const uploadedUrls = []
 
-    if (error) {
-      toast.error(error.message)
-      setUploading(false)
-      return
+    for (const file of files) {
+      const extension = file.name.split('.').pop()
+      const filePath = `${page}/${crypto.randomUUID()}.${extension}`
+      const { error } = await supabase.storage
+        .from('card-images')
+        .upload(filePath, file, { upsert: false })
+
+      if (error) {
+        toast.error(error.message)
+        setUploading(false)
+        return
+      }
+
+      const { data } = supabase.storage
+        .from('card-images')
+        .getPublicUrl(filePath)
+
+      uploadedUrls.push(data.publicUrl)
     }
 
-    const { data } = supabase.storage
-      .from('card-images')
-      .getPublicUrl(filePath)
-
     setFormData((current) => ({
       ...current,
-      image_url: data.publicUrl,
+      image_urls: [...current.image_urls, ...uploadedUrls],
     }))
     setUploading(false)
-    toast.success('Image uploaded')
+    toast.success(uploadedUrls.length === 1 ? 'Image uploaded' : 'Images uploaded')
+    event.target.value = ''
   }
 
-  async function handleRemoveImage() {
+  async function handleRemoveImage(index) {
     setFormData((current) => ({
       ...current,
-      image_url: '',
+      image_urls: current.image_urls.filter((_image, imageIndex) => imageIndex !== index),
     }))
     toast.success('Image removed from card')
   }
@@ -98,7 +105,8 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
     try {
       await onSave({
         ...formData,
-        image_url: formData.image_url || null,
+        image_url: formData.image_urls[0] || null,
+        image_urls: formData.image_urls,
         features: formData.features.map((feature) => feature.trim()).filter(Boolean),
       })
 
@@ -205,33 +213,38 @@ function CardModal({ card, page, isOpen, onClose, onSave }) {
             <label className="mb-2 block text-sm font-medium text-gray-700">Picture</label>
             <label className="flex cursor-pointer items-center justify-center gap-3 rounded-lg border-2 border-dashed border-primary-200 bg-primary-50 px-4 py-6 text-primary-700 transition-colors hover:bg-primary-100">
               <FaUpload />
-              <span className="font-semibold">{formData.image_url ? 'Upload Replacement Picture' : 'Upload Picture'}</span>
+              <span className="font-semibold">Upload Pictures</span>
               <input
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={handleUpload}
                 className="hidden"
               />
             </label>
             {uploading && <p className="mt-2 text-sm text-gray-600">Uploading...</p>}
-            {formData.image_url && (
-              <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-                <img
-                  src={formData.image_url}
-                  alt="Card preview"
-                  className="h-48 w-full rounded-lg bg-gray-100 object-contain"
-                />
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="mt-3 inline-flex items-center gap-2 rounded-lg bg-red-100 px-4 py-2 font-semibold text-red-700 hover:bg-red-200"
-                >
-                  <FaTrash className="text-sm" />
-                  Delete Picture
-                </button>
+            {formData.image_urls.length > 0 && (
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                {formData.image_urls.map((imageUrl, index) => (
+                  <div key={`${imageUrl}-${index}`} className="rounded-lg border border-gray-200 bg-white p-3">
+                    <img
+                      src={imageUrl}
+                      alt={`Card preview ${index + 1}`}
+                      className="h-36 w-full rounded-lg bg-gray-100 object-contain"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(index)}
+                      className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-100 px-4 py-2 font-semibold text-red-700 hover:bg-red-200"
+                    >
+                      <FaTrash className="text-sm" />
+                      Delete Picture
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
-            {!formData.image_url && (
+            {!formData.image_urls.length && (
               <div className="mt-4 flex h-32 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
                 <div className="text-center">
                   <FaImage className="mx-auto mb-2 text-2xl" />

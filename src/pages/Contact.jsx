@@ -1,6 +1,16 @@
 import React, { useState } from 'react'
 import { FaPhone, FaEnvelope, FaWhatsapp, FaClock, FaUser, FaSms, FaTimes } from 'react-icons/fa'
 import EditableText from '../components/EditableText'
+import useSiteContent from '../hooks/useSiteContent'
+
+function cleanPhone(phone) {
+  return phone.replace(/[^\d+]/g, '')
+}
+
+function toWhatsAppNumber(phone) {
+  const digits = phone.replace(/[^\d]/g, '')
+  return digits.startsWith('260') ? digits : `260${digits.replace(/^0/, '')}`
+}
 
 /**
  * Contact Page Component
@@ -14,6 +24,11 @@ import EditableText from '../components/EditableText'
  * - Direct contact methods (phone, email, WhatsApp)
  */
 function Contact() {
+  const businessPhone = useSiteContent('contact', 'phone', '0973 131 425')
+  const businessEmail = useSiteContent('contact', 'email', 'Dinganipeleka15@gmail.com')
+  const businessWhatsapp = useSiteContent('contact', 'whatsapp', '0973 131 425')
+  const owner = useSiteContent('contact', 'owner', 'Dingani Leonard Peleka')
+
   // Form state management
   const [formData, setFormData] = useState({
     name: '',
@@ -87,7 +102,7 @@ Requested via OAKTIMBER website.`
   const handleSendEmail = () => {
     const subject = `New Contact: ${formData.service} - ${formData.name}`
     const body = generateMessage()
-    const mailtoLink = `mailto:Dinganipeleka15@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    const mailtoLink = `mailto:${businessEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
     window.location.href = mailtoLink
     resetFormAndCloseModal()
   }
@@ -95,7 +110,7 @@ Requested via OAKTIMBER website.`
   // Handle WhatsApp sending
   const handleSendWhatsApp = () => {
     const message = `Hello OAKTIMBER,%0A%0A${generateMessage()}`
-    const whatsappLink = `https://wa.me/260973131425?text=${encodeURIComponent(message.replace(/%0A/g, '\n'))}`
+    const whatsappLink = `https://wa.me/${toWhatsAppNumber(businessWhatsapp)}?text=${encodeURIComponent(message.replace(/%0A/g, '\n'))}`
     window.open(whatsappLink, '_blank')
     resetFormAndCloseModal()
   }
@@ -103,7 +118,7 @@ Requested via OAKTIMBER website.`
   // Handle SMS sending
   const handleSendSMS = () => {
     const body = generateMessage()
-    const smsLink = `sms:0973131425?body=${encodeURIComponent(body)}`
+    const smsLink = `sms:${cleanPhone(businessPhone)}?body=${encodeURIComponent(body)}`
     window.location.href = smsLink
     resetFormAndCloseModal()
   }
@@ -296,8 +311,8 @@ Requested via OAKTIMBER website.`
                   </div>
                   <div>
                     <p className="font-medium text-gray-900 mb-1">Phone</p>
-                    <a href="tel:0973131425" className="text-primary-600 hover:text-primary-700">
-                      0973 131 425
+                    <a href={`tel:${cleanPhone(businessPhone)}`} className="text-primary-600 hover:text-primary-700">
+                      <EditableText page="contact" section="phone" defaultValue="0973 131 425" />
                     </a>
                   </div>
                 </div>
@@ -310,10 +325,10 @@ Requested via OAKTIMBER website.`
                   <div>
                     <p className="font-medium text-gray-900 mb-1">Email</p>
                     <a 
-                      href="mailto:Dinganipeleka15@gmail.com" 
+                      href={`mailto:${businessEmail}`}
                       className="text-primary-600 hover:text-primary-700 break-all text-sm"
                     >
-                      Dinganipeleka15@gmail.com
+                      <EditableText page="contact" section="email" defaultValue="Dinganipeleka15@gmail.com" />
                     </a>
                   </div>
                 </div>
@@ -326,12 +341,12 @@ Requested via OAKTIMBER website.`
                   <div>
                     <p className="font-medium text-gray-900 mb-1">WhatsApp</p>
                     <a 
-                      href="https://wa.me/260973131425" 
+                      href={`https://wa.me/${toWhatsAppNumber(businessWhatsapp)}`}
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-primary-600 hover:text-primary-700"
                     >
-                      Chat with us
+                      <EditableText page="contact" section="whatsapp" defaultValue="0973 131 425" />
                     </a>
                   </div>
                 </div>
@@ -343,7 +358,9 @@ Requested via OAKTIMBER website.`
                   </div>
                   <div>
                     <p className="font-medium text-gray-900 mb-1">Owner</p>
-                    <p className="text-gray-700">Dingani Leonard Peleka</p>
+                    <p className="text-gray-700">
+                      <EditableText page="contact" section="owner" defaultValue={owner} />
+                    </p>
                   </div>
                 </div>
               </div>
