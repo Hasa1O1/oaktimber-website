@@ -49,6 +49,38 @@ function App() {
                 </ProtectedRoute>
               )}
             />
+            <Route
+              path="/admin/preview/about"
+              element={(
+                <ProtectedRoute>
+                  <About />
+                </ProtectedRoute>
+              )}
+            />
+            <Route
+              path="/admin/preview/products"
+              element={(
+                <ProtectedRoute>
+                  <Products />
+                </ProtectedRoute>
+              )}
+            />
+            <Route
+              path="/admin/preview/gallery"
+              element={(
+                <ProtectedRoute>
+                  <Gallery />
+                </ProtectedRoute>
+              )}
+            />
+            <Route
+              path="/admin/preview/contact"
+              element={(
+                <ProtectedRoute>
+                  <Contact />
+                </ProtectedRoute>
+              )}
+            />
           </Routes>
         </main>
         

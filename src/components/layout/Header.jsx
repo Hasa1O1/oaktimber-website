@@ -30,6 +30,8 @@ function Header() {
     { name: 'Gallery', path: '/gallery' },
     { name: 'Contact', path: '/contact' },
   ]
+  const getNavPath = (path) => (isAdmin ? `/admin/preview${path === '/' ? '' : path}` : path)
+  const getIsActive = (path) => location.pathname === path || location.pathname === getNavPath(path)
 
   const handleLogout = async () => {
     if (!supabase) return
@@ -88,9 +90,9 @@ function Header() {
             {navItems.map((item) => (
               <Link
                 key={item.path}
-                to={item.path}
+                to={getNavPath(item.path)}
                 className={`font-medium transition-colors duration-200 hover:text-primary-600 ${
-                  location.pathname === item.path
+                  getIsActive(item.path)
                     ? 'text-primary-600 border-b-2 border-primary-600 pb-1'
                     : 'text-gray-700'
                 }`}
@@ -98,7 +100,7 @@ function Header() {
                 {item.name}
               </Link>
             ))}
-            <Link to="/contact" className="btn-primary">
+            <Link to={getNavPath('/contact')} className="btn-primary">
               Get a Quote
             </Link>
             {isAdmin && (
@@ -130,9 +132,9 @@ function Header() {
               {navItems.map((item) => (
                 <Link
                   key={item.path}
-                  to={item.path}
+                  to={getNavPath(item.path)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
-                    location.pathname === item.path
+                    getIsActive(item.path)
                       ? 'bg-primary-100 text-primary-700'
                       : 'text-gray-700 hover:bg-primary-50'
                   }`}
@@ -140,7 +142,7 @@ function Header() {
                   {item.name}
                 </Link>
               ))}
-              <Link to="/contact" className="btn-primary mx-4">
+              <Link to={getNavPath('/contact')} className="btn-primary mx-4">
                 Get a Quote
               </Link>
               {isAdmin && (
