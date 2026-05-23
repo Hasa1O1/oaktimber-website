@@ -5,15 +5,16 @@ import useAdminMode from '../hooks/useAdminMode'
 
 function EditableText({ page, section, defaultValue, multiline = false }) {
   const { isAdmin, supabase } = useAdminMode()
-  const [value, setValue] = useState(defaultValue)
-  const [draft, setDraft] = useState(defaultValue)
+  const fallbackValue = typeof defaultValue === 'string' ? defaultValue : String(defaultValue ?? '')
+  const [value, setValue] = useState(fallbackValue)
+  const [draft, setDraft] = useState(fallbackValue)
   const [open, setOpen] = useState(false)
   const channelName = useMemo(() => `site_content:${page}:${section}`, [page, section])
 
   useEffect(() => {
-    setValue(defaultValue)
-    setDraft(defaultValue)
-  }, [defaultValue])
+    setValue(fallbackValue)
+    setDraft(fallbackValue)
+  }, [fallbackValue])
 
   useEffect(() => {
     if (!supabase) return undefined
@@ -30,7 +31,7 @@ function EditableText({ page, section, defaultValue, multiline = false }) {
 
       if (!mounted) return
 
-      if (!error && data?.content !== undefined) {
+      if (!error && typeof data?.content === 'string' && data.content.trim() !== '') {
         setValue(data.content)
         setDraft(data.content)
       }
@@ -44,7 +45,11 @@ function EditableText({ page, section, defaultValue, multiline = false }) {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'site_content', filter: `page=eq.${page}` },
         (payload) => {
-          const row = payload.new?.section === section ? payload.new : null
+          const row = payload.new?.section === section &&
+            typeof payload.new.content === 'string' &&
+            payload.new.content.trim() !== ''
+            ? payload.new
+            : null
           if (row) {
             setValue(row.content)
             setDraft(row.content)
