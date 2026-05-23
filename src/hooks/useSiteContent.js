@@ -26,7 +26,7 @@ function useSiteContent(page, section, defaultValue = '') {
 
       if (!mounted) return
 
-      if (!error && data?.content !== undefined) {
+      if (!error && typeof data?.content === 'string' && data.content.trim() !== '') {
         setValue(data.content)
       }
     }
@@ -39,7 +39,11 @@ function useSiteContent(page, section, defaultValue = '') {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'site_content', filter: `page=eq.${page}` },
         (payload) => {
-          if (payload.new?.section === section) {
+          if (
+            payload.new?.section === section &&
+            typeof payload.new.content === 'string' &&
+            payload.new.content.trim() !== ''
+          ) {
             setValue(payload.new.content)
           }
         },

@@ -3,12 +3,12 @@ import { FaPhone, FaEnvelope, FaWhatsapp, FaClock, FaUser, FaSms, FaTimes } from
 import EditableText from '../components/EditableText'
 import useSiteContent from '../hooks/useSiteContent'
 
-function cleanPhone(phone) {
-  return phone.replace(/[^\d+]/g, '')
+function cleanPhone(phone = '') {
+  return String(phone).replace(/[^\d+]/g, '')
 }
 
-function toWhatsAppNumber(phone) {
-  const digits = phone.replace(/[^\d]/g, '')
+function toWhatsAppNumber(phone = '') {
+  const digits = String(phone).replace(/[^\d]/g, '')
   return digits.startsWith('260') ? digits : `260${digits.replace(/^0/, '')}`
 }
 
