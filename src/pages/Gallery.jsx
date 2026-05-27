@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { FaPencilAlt, FaPlus, FaTrash } from 'react-icons/fa'
+import React, { useEffect, useRef, useState } from 'react'
+import { FaPencilAlt, FaPlus, FaTimes, FaTrash } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import EditableText from '../components/EditableText'
 import CardModal from '../components/CardModal'
@@ -12,6 +12,9 @@ function Gallery() {
   const { cards, createCard, updateCard, deleteCard } = useCards('gallery', defaultGalleryCards)
   const [editingCard, setEditingCard] = useState(null)
   const [isCardModalOpen, setIsCardModalOpen] = useState(false)
+  const [expandedCard, setExpandedCard] = useState(null)
+  const [overflowingCards, setOverflowingCards] = useState({})
+  const cardTextRefs = useRef({})
 
   function openCreateModal() {
     setEditingCard(null)
@@ -45,6 +48,29 @@ function Gallery() {
       toast.error(error.message)
     }
   }
+
+  useEffect(() => {
+    const measureOverflow = () => {
+      const nextOverflowingCards = {}
+
+      cards.forEach((card) => {
+        const element = cardTextRefs.current[card.id]
+        if (!element) return
+
+        nextOverflowingCards[card.id] = element.scrollHeight > element.clientHeight + 1
+      })
+
+      setOverflowingCards(nextOverflowingCards)
+    }
+
+    const frame = requestAnimationFrame(measureOverflow)
+    window.addEventListener('resize', measureOverflow)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('resize', measureOverflow)
+    }
+  }, [cards])
 
   return (
     <div className="min-h-screen">
@@ -121,17 +147,33 @@ function Gallery() {
                   <h3 className="text-primary-800 group-hover:text-primary-600 transition-colors">
                     {card.title || card.name}
                   </h3>
-                  <p className="text-gray-600">
-                    {card.description}
-                  </p>
-                  {card.features?.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {card.features.map((feature, index) => (
-                        <span key={index} className="rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-700">
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
+                  <div
+                    ref={(element) => {
+                      cardTextRefs.current[card.id] = element
+                    }}
+                    className="h-[120px] overflow-hidden"
+                  >
+                    <p className="text-gray-600">
+                      {card.description}
+                    </p>
+                    {card.features?.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        {card.features.map((feature, index) => (
+                          <span key={index} className="rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-700">
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {overflowingCards[card.id] && (
+                    <button
+                      type="button"
+                      onClick={() => setExpandedCard(card)}
+                      className="font-semibold text-primary-600 hover:text-primary-700"
+                    >
+                      Read More
+                    </button>
                   )}
                 </div>
               </div>
@@ -169,6 +211,46 @@ function Gallery() {
         onClose={() => setIsCardModalOpen(false)}
         onSave={handleSaveCard}
       />
+      {expandedCard && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onClick={() => setExpandedCard(null)}>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-gray-200 p-5">
+              <h3 className="text-2xl font-semibold text-primary-900">{expandedCard.title || expandedCard.name}</h3>
+              <button
+                type="button"
+                onClick={() => setExpandedCard(null)}
+                className="rounded-full p-2 text-gray-500 hover:bg-gray-100"
+                aria-label="Close gallery details"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className="space-y-5 p-5">
+              {expandedCard.image_url || expandedCard.images?.[0] ? (
+                <img
+                  src={expandedCard.image_url || expandedCard.images[0]}
+                  alt={expandedCard.title || expandedCard.name}
+                  className="h-72 w-full rounded-lg bg-gray-100 object-cover"
+                />
+              ) : (
+                <div className="h-72 w-full rounded-lg bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
+                  <p className="text-white font-semibold">{expandedCard.title || expandedCard.name}</p>
+                </div>
+              )}
+              <p className="text-gray-700">{expandedCard.description}</p>
+              {expandedCard.features?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {expandedCard.features.map((feature, index) => (
+                    <span key={index} className="rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-700">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
