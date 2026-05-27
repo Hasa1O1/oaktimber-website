@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaPencilAlt, FaTimes } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import useAdminMode from '../hooks/useAdminMode'
@@ -9,7 +9,6 @@ function EditableText({ page, section, defaultValue, multiline = false }) {
   const [value, setValue] = useState(fallbackValue)
   const [draft, setDraft] = useState(fallbackValue)
   const [open, setOpen] = useState(false)
-  const channelName = useMemo(() => `site_content:${page}:${section}`, [page, section])
 
   useEffect(() => {
     setValue(fallbackValue)
@@ -39,30 +38,10 @@ function EditableText({ page, section, defaultValue, multiline = false }) {
 
     loadContent()
 
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'site_content', filter: `page=eq.${page}` },
-        (payload) => {
-          const row = payload.new?.section === section &&
-            typeof payload.new.content === 'string' &&
-            payload.new.content.trim() !== ''
-            ? payload.new
-            : null
-          if (row) {
-            setValue(row.content)
-            setDraft(row.content)
-          }
-        },
-      )
-      .subscribe()
-
     return () => {
       mounted = false
-      supabase.removeChannel(channel)
     }
-  }, [channelName, page, section, supabase])
+  }, [page, section, supabase])
 
   async function handleSave() {
     if (!supabase) return
