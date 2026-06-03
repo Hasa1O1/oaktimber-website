@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { FaPencilAlt, FaPlus, FaTimes, FaTrash } from 'react-icons/fa'
+import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTimes, FaTrash } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import EditableText from '../components/EditableText'
 import CardModal from '../components/CardModal'
+import ConfirmModal from '../components/ConfirmModal'
 import useAdminMode from '../hooks/useAdminMode'
 import { useCards } from '../hooks/useCards'
 import { defaultGalleryCards } from '../data/cards'
@@ -10,8 +11,11 @@ import { defaultGalleryCards } from '../data/cards'
 function Gallery() {
   const { isAdmin } = useAdminMode()
   const { cards, createCard, updateCard, deleteCard } = useCards('gallery', defaultGalleryCards)
+  const [galleryImageIndices, setGalleryImageIndices] = useState({})
   const [editingCard, setEditingCard] = useState(null)
+  const [deletingCard, setDeletingCard] = useState(null)
   const [isCardModalOpen, setIsCardModalOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [expandedCard, setExpandedCard] = useState(null)
   const [overflowingCards, setOverflowingCards] = useState({})
   const cardTextRefs = useRef({})
@@ -38,15 +42,31 @@ function Gallery() {
     }
   }
 
-  async function handleDeleteCard(card) {
-    const confirmed = window.confirm(`Delete "${card.title || card.name}"?`)
-    if (!confirmed) return
-
+  async function handleConfirmDelete() {
+    if (!deletingCard) return
+    setIsDeleting(true)
     try {
-      await deleteCard(card.id)
+      await deleteCard(deletingCard.id)
+      setDeletingCard(null)
     } catch (error) {
       toast.error(error.message)
+    } finally {
+      setIsDeleting(false)
     }
+  }
+
+  const navigateGalleryImage = (cardId, direction) => {
+    setGalleryImageIndices((prev) => {
+      const currentIndex = prev[cardId] || 0
+      const card = cards.find((item) => item.id === cardId)
+      const maxIndex = card?.images?.length ? card.images.length - 1 : 0
+
+      const newIndex = direction === 'next'
+        ? currentIndex >= maxIndex ? 0 : currentIndex + 1
+        : currentIndex <= 0 ? maxIndex : currentIndex - 1
+
+      return { ...prev, [cardId]: newIndex }
+    })
   }
 
   useEffect(() => {
@@ -106,78 +126,129 @@ function Gallery() {
           )}
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cards.map((card) => (
-              <div key={card.id} className="card group relative animate-fade-in">
-                {isAdmin && (
-                  <div className="absolute right-3 top-3 z-30 flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => openEditModal(card)}
-                      className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg hover:bg-primary-700"
-                      aria-label="Edit gallery card"
-                    >
-                      <FaPencilAlt className="text-sm" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteCard(card)}
-                      className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700"
-                      aria-label="Delete gallery card"
-                    >
-                      <FaTrash className="text-sm" />
-                    </button>
-                  </div>
-                )}
+            {cards.map((card) => {
+              const currentImageIndex = galleryImageIndices[card.id] || 0
+              const currentImage = card.images ? card.images[currentImageIndex] : card.image_url
+              const hasMultipleImages = card.images && card.images.length > 1
 
-                <div className="relative aspect-square bg-gray-100 overflow-hidden">
-                  {card.image_url || card.images?.[0] ? (
-                    <img
-                      src={card.image_url || card.images[0]}
-                      alt={card.title || card.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-200 to-primary-400 p-4 text-center text-white">
-                      <p className="font-semibold">{card.title || card.name}</p>
+              return (
+                <div key={card.id} className="card animate-fade-in group relative flex h-[620px] flex-col">
+                  {isAdmin && (
+                    <div className="absolute right-3 top-3 z-30 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(card)}
+                        className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg hover:bg-primary-700"
+                        aria-label="Edit gallery card"
+                      >
+                        <FaPencilAlt className="text-sm" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingCard(card)}
+                        className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700"
+                        aria-label="Delete gallery card"
+                      >
+                        <FaTrash className="text-sm" />
+                      </button>
                     </div>
                   )}
-                </div>
 
-                <div className="p-6 space-y-3">
-                  <h3 className="text-primary-800 group-hover:text-primary-600 transition-colors">
-                    {card.title || card.name}
-                  </h3>
-                  <div
-                    ref={(element) => {
-                      cardTextRefs.current[card.id] = element
-                    }}
-                    className="h-[120px] overflow-hidden"
-                  >
-                    <p className="text-gray-600">
-                      {card.description}
-                    </p>
-                    {card.features?.length > 0 && (
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        {card.features.map((feature, index) => (
-                          <span key={index} className="rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-700">
-                            {feature}
-                          </span>
+                  {currentImage ? (
+                    <div className="relative h-64 flex-shrink-0 bg-gray-100 overflow-hidden">
+                      <img
+                        src={currentImage}
+                        alt={card.title || card.name}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                      />
+
+                      {hasMultipleImages && (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              navigateGalleryImage(card.id, 'prev')
+                            }}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            aria-label="Previous image"
+                          >
+                            <FaChevronLeft className="text-sm" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              navigateGalleryImage(card.id, 'next')
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            aria-label="Next image"
+                          >
+                            <FaChevronRight className="text-sm" />
+                          </button>
+                          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
+                            {card.images.map((_, index) => (
+                              <div
+                                key={index}
+                                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                                  index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="h-64 flex-shrink-0 bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
+                      <div className="text-center text-white p-4">
+                        <p className="font-semibold">{card.title || card.name}</p>
+                        <p className="text-sm opacity-90 mt-1">Gallery Image</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex min-h-0 flex-1 flex-col p-6">
+                    <div
+                      ref={(element) => {
+                        cardTextRefs.current[card.id] = element
+                      }}
+                      className="h-[248px] overflow-hidden"
+                    >
+                      <h3 className="text-primary-800">
+                        {card.title || card.name}
+                      </h3>
+                      <p className="mt-3 text-gray-600">
+                        {card.description}
+                      </p>
+
+                      <ul className="mt-4 space-y-2">
+                        {(card.features || []).map((feature, index) => (
+                          <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                            <div className="mt-1 flex-shrink-0">
+                              <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
+                                <FaCheck className="text-primary-600 text-xs" />
+                              </div>
+                            </div>
+                            <span>{feature}</span>
+                          </li>
                         ))}
+                      </ul>
+                    </div>
+
+                    {overflowingCards[card.id] && (
+                      <div className="mt-auto pt-4">
+                        <button
+                          type="button"
+                          onClick={() => setExpandedCard(card)}
+                          className="font-semibold text-primary-600 hover:text-primary-700"
+                        >
+                          Read More
+                        </button>
                       </div>
                     )}
                   </div>
-                  {overflowingCards[card.id] && (
-                    <button
-                      type="button"
-                      onClick={() => setExpandedCard(card)}
-                      className="font-semibold text-primary-600 hover:text-primary-700"
-                    >
-                      Read More
-                    </button>
-                  )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -210,6 +281,18 @@ function Gallery() {
         isOpen={isCardModalOpen}
         onClose={() => setIsCardModalOpen(false)}
         onSave={handleSaveCard}
+      />
+      <ConfirmModal
+        isOpen={Boolean(deletingCard)}
+        title="Delete Gallery Card?"
+        message={`This will permanently delete "${deletingCard?.title || deletingCard?.name || 'this card'}" from the website. This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        loading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setDeletingCard(null)
+        }}
       />
       {expandedCard && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onClick={() => setExpandedCard(null)}>

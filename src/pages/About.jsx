@@ -1,6 +1,7 @@
 import React from 'react'
 import { FaAward, FaHammer, FaHeart, FaLeaf } from 'react-icons/fa'
 import EditableText from '../components/EditableText'
+import EditableImage from '../components/EditableImage'
 
 function About() {
   const values = [
@@ -81,7 +82,12 @@ function About() {
         <div className="container-custom">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative">
-              <img src="/images/CEO image.png" alt="Dingani Leonard Peleka - CEO of OAKTIMBER" className="w-full aspect-square object-cover rounded-2xl shadow-xl" />
+              <EditableImage
+                page="about"
+                section="ceo_image"
+                defaultValue="/images/CEO image.png"
+                alt="Dingani Leonard Peleka - CEO of OAKTIMBER"
+              />
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-400 rounded-2xl opacity-20 -z-10"></div>
             </div>
 

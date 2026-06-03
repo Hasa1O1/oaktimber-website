@@ -2,10 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaArrowRight, FaCheck, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 import EditableText from '../components/EditableText'
+import EditableImage from '../components/EditableImage'
+import EditableHeroImages from '../components/EditableHeroImages'
+import useAdminMode from '../hooks/useAdminMode'
 
 function Home() {
+  const { supabase } = useAdminMode()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [productImageIndices, setProductImageIndices] = useState({})
+  const [heroImages, setHeroImages] = useState(['/images/hero image 3.png', '/images/hero image 2.png', '/images/hero image 1.jpg'])
 
   const featuredProducts = [
     {
@@ -38,11 +43,46 @@ function Home() {
   ]
 
   useEffect(() => {
+    if (!supabase) return undefined
+
+    let mounted = true
+
+    async function loadHeroImages() {
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('content')
+        .eq('page', 'home')
+        .eq('section', 'hero_images')
+        .maybeSingle()
+
+      if (!mounted) return
+
+      if (!error && data?.content) {
+        try {
+          const parsed = JSON.parse(data.content)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setHeroImages(parsed)
+          }
+        } catch {
+          // Fall back to default if JSON parsing fails
+        }
+      }
+    }
+
+    loadHeroImages()
+
+    return () => {
+      mounted = false
+    }
+  }, [supabase])
+
+  useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % 3)
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length)
     }, 5000)
     return () => clearInterval(interval)
-  }, [])
+  }, [heroImages.length])
+
 
   const navigateProductImage = (productId, direction) => {
     setProductImageIndices((prev) => {
@@ -117,14 +157,14 @@ function Home() {
             </div>
 
             <div className="relative animate-slide-in-right h-96">
-              {['/images/hero image 3.png', '/images/hero image 2.png', '/images/hero image 1.jpg'].map((image, index) => (
+              {heroImages.map((image, index) => (
                 <div
                   key={image}
                   className={`absolute inset-0 rounded-2xl overflow-hidden transition-opacity duration-700 ${
                     index === 0 ? 'shadow-lg transform -rotate-6 translate-y-4 translate-x-4 z-0' : ''
                   } ${index === 1 ? 'shadow-xl transform rotate-3 translate-y-2 translate-x-2 z-10' : ''} ${
                     index === 2 ? 'shadow-2xl z-20' : ''
-                  } ${currentImageIndex === (2 - index) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                  } ${currentImageIndex === (heroImages.length - 1 - index) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 >
                   <img src={image} alt="OAKTIMBER craftsmanship" className="w-full h-full object-cover" />
                 </div>
@@ -132,6 +172,7 @@ function Home() {
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-600 rounded-2xl opacity-20 -z-10"></div>
               <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary-400 rounded-full opacity-20 -z-10"></div>
             </div>
+            <EditableHeroImages page="home" section="hero_images" defaultImages={heroImages} />
           </div>
         </div>
       </section>
@@ -239,7 +280,12 @@ function Home() {
         <div className="container-custom">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative">
-              <img src="/images/why choose us image..jpg" alt="OAKTIMBER workshop and craftsmanship" className="w-full aspect-square object-cover rounded-2xl shadow-xl" />
+              <EditableImage
+                page="home"
+                section="why_choose_us_image"
+                defaultValue="/images/why choose us image..jpg"
+                alt="OAKTIMBER workshop and craftsmanship"
+              />
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-400 rounded-2xl opacity-20 -z-10"></div>
             </div>
 
