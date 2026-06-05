@@ -115,7 +115,7 @@ function Products() {
     <div className="min-h-screen">
       <section className="bg-gradient-to-br from-primary-100 to-accent-cream section-padding">
         <div className="container-custom text-center">
-          <h1 className="text-primary-900 mb-6 animate-fade-in">
+          <h1 className="text-wood-dark mb-6 animate-fade-in">
             <EditableText page="products" section="page_title" defaultValue="Products & Services" />
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
