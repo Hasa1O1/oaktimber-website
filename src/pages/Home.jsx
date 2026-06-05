@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FaArrowRight, FaCheck, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import { FaArrowRight, FaCheck, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa'
 import EditableText from '../components/EditableText'
 import EditableImage from '../components/EditableImage'
 import EditableHeroImages from '../components/EditableHeroImages'
@@ -15,6 +15,9 @@ function Home() {
   const [heroImagesLoaded, setHeroImagesLoaded] = useState(false)
   const [featuredProducts, setFeaturedProducts] = useState([])
   const [loadingFeatured, setLoadingFeatured] = useState(false)
+  const [expandedCard, setExpandedCard] = useState(null)
+  const [overflowingCards, setOverflowingCards] = useState({})
+  const cardTextRefs = useRef({})
 
   const benefits = [
     'Premium quality materials (Maple wood, MDF, Compressed boards)',
@@ -69,11 +72,13 @@ function Home() {
   }, [supabase])
 
   useEffect(() => {
+    if (!heroImages?.length) return undefined
+
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length)
     }, 5000)
     return () => clearInterval(interval)
-  }, [heroImages.length])
+  }, [heroImages])
 
   useEffect(() => {
     if (!supabase) {
@@ -149,6 +154,29 @@ function Home() {
       mounted = false
     }
   }, [supabase])
+
+  useEffect(() => {
+    const measureOverflow = () => {
+      const nextOverflowingCards = {}
+
+      featuredProducts.forEach((product) => {
+        const element = cardTextRefs.current[product.id]
+        if (!element) return
+
+        nextOverflowingCards[product.id] = element.scrollHeight > element.clientHeight + 1
+      })
+
+      setOverflowingCards(nextOverflowingCards)
+    }
+
+    const frame = requestAnimationFrame(measureOverflow)
+    window.addEventListener('resize', measureOverflow)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('resize', measureOverflow)
+    }
+  }, [featuredProducts])
 
 
   const navigateProductImage = (productId, direction) => {
@@ -297,58 +325,112 @@ function Home() {
             </div>
           ) : (
             <>
-              <div className="grid md:grid-cols-3 gap-8 mb-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
                 {featuredProducts.map((product) => {
-                  const imageIndex = productImageIndices[product.id] || 0
-                  const currentImage = product.images?.[imageIndex] || product.image_url
+                  const currentImageIndex = productImageIndices[product.id] || 0
+                  const currentImage = product.images ? product.images[currentImageIndex] : product.image_url
                   const hasMultipleImages = product.images && product.images.length > 1
 
                   return (
-                    <div key={product.id} className="card group">
-                      <div className="relative aspect-square bg-gray-100 overflow-hidden">
-                        {currentImage ? (
-                          <img src={currentImage} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-200 to-primary-400">
-                            <p className="text-center text-white font-semibold">{product.name}</p>
+                    <div key={product.id} className="card animate-fade-in group relative flex h-[620px] flex-col">
+                      {currentImage ? (
+                        <div className="relative h-64 flex-shrink-0 bg-gray-100 overflow-hidden">
+                          <img
+                            src={currentImage}
+                            alt={product.title || product.name}
+                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                          />
+
+                          {hasMultipleImages && (
+                            <>
+                              <button
+                                onClick={(event) => {
+                                  event.preventDefault()
+                                  navigateProductImage(product.id, 'prev')
+                                }}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                aria-label="Previous image"
+                              >
+                                <FaChevronLeft className="text-sm" />
+                              </button>
+                              <button
+                                onClick={(event) => {
+                                  event.preventDefault()
+                                  navigateProductImage(product.id, 'next')
+                                }}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                aria-label="Next image"
+                              >
+                                <FaChevronRight className="text-sm" />
+                              </button>
+                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
+                                {product.images.map((_, index) => (
+                                  <div
+                                    key={index}
+                                    className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                                      index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="h-64 flex-shrink-0 bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
+                          <div className="text-center text-white p-4">
+                            <p className="font-semibold">{product.title || product.name}</p>
+                            <p className="text-sm opacity-90 mt-1">Product Image</p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex min-h-0 flex-1 flex-col p-6">
+                        <div
+                          ref={(element) => {
+                            cardTextRefs.current[product.id] = element
+                          }}
+                          className="h-[248px] overflow-hidden"
+                        >
+                          <div className="flex items-start justify-between">
+                            <h3 className="text-primary-800">
+                              {product.title || product.name}
+                            </h3>
+                            {product.price && (
+                              <span className="text-xl font-bold text-primary-600">
+                                {product.price}
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-3 text-gray-600">
+                            {product.description}
+                          </p>
+
+                          <ul className="mt-4 space-y-2">
+                            {(product.features || []).map((feature, index) => (
+                              <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                                <div className="mt-1 flex-shrink-0">
+                                  <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
+                                    <FaCheck className="text-primary-600 text-xs" />
+                                  </div>
+                                </div>
+                                <span>{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {overflowingCards[product.id] && (
+                          <div className="mt-auto pt-4">
+                            <button
+                              type="button"
+                              onClick={() => setExpandedCard(product)}
+                              className="font-semibold text-primary-600 hover:text-primary-700"
+                            >
+                              Read More
+                            </button>
                           </div>
                         )}
-                        {hasMultipleImages && (
-                          <>
-                            <button
-                              onClick={(event) => {
-                                event.preventDefault()
-                                navigateProductImage(product.id, 'prev')
-                              }}
-                              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                              aria-label="Previous image"
-                            >
-                              <FaChevronLeft className="text-sm" />
-                            </button>
-                            <button
-                              onClick={(event) => {
-                                event.preventDefault()
-                                navigateProductImage(product.id, 'next')
-                              }}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                              aria-label="Next image"
-                            >
-                              <FaChevronRight className="text-sm" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                      <div className="p-6 space-y-3">
-                        <h3 className="text-primary-800 group-hover:text-primary-600 transition-colors">
-                          {product.name}
-                        </h3>
-                        <p className="text-gray-600">
-                          {product.description}
-                        </p>
-                        <Link to="/products" className="inline-flex items-center text-primary-600 font-medium hover:text-primary-700 gap-2">
-                          Learn More
-                          <FaArrowRight className="text-xs" />
-                        </Link>
                       </div>
                     </div>
                   )
@@ -436,6 +518,47 @@ function Home() {
         </div>
       </section>
       </>
+      )}
+      {expandedCard && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onClick={() => setExpandedCard(null)}>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-gray-200 p-5">
+              <h3 className="text-2xl font-semibold text-primary-900">{expandedCard.title || expandedCard.name}</h3>
+              <button
+                type="button"
+                onClick={() => setExpandedCard(null)}
+                className="rounded-full p-2 text-gray-500 hover:bg-gray-100"
+                aria-label="Close product details"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className="space-y-5 p-5">
+              {expandedCard.images?.[0] && (
+                <img
+                  src={expandedCard.images[0]}
+                  alt={expandedCard.title || expandedCard.name}
+                  className="h-72 w-full rounded-lg bg-gray-100 object-contain"
+                />
+              )}
+              <p className="text-gray-700">{expandedCard.description}</p>
+              {expandedCard.features?.length > 0 && (
+                <ul className="space-y-2">
+                  {expandedCard.features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-2 text-gray-700">
+                      <div className="mt-1 flex-shrink-0">
+                        <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
+                          <FaCheck className="text-primary-600 text-xs" />
+                        </div>
+                      </div>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
