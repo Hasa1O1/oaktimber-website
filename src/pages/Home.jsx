@@ -4,6 +4,7 @@ import { FaArrowRight, FaCheck, FaChevronLeft, FaChevronRight } from 'react-icon
 import EditableText from '../components/EditableText'
 import EditableImage from '../components/EditableImage'
 import EditableHeroImages from '../components/EditableHeroImages'
+import EditableFeaturedProducts from '../components/EditableFeaturedProducts'
 import useAdminMode from '../hooks/useAdminMode'
 
 function Home() {
@@ -11,27 +12,8 @@ function Home() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [productImageIndices, setProductImageIndices] = useState({})
   const [heroImages, setHeroImages] = useState(['/images/hero image 3.png', '/images/hero image 2.png', '/images/hero image 1.jpg'])
-
-  const featuredProducts = [
-    {
-      id: 1,
-      name: 'TV Stands',
-      description: 'Wall-mounted and floor-standing TV units with integrated storage solutions.',
-      images: ['/images/TV Stand.png'],
-    },
-    {
-      id: 2,
-      name: 'Book Shelves',
-      description: 'Custom-built shelves and storage solutions designed to maximize your space.',
-      images: ['/images/Book Shelves 1.png', '/images/Book Shelves 2.png'],
-    },
-    {
-      id: 3,
-      name: 'Wardrobe Installation',
-      description: 'Complete wardrobe systems and closet installations tailored to your needs.',
-      images: ['/images/Waderope installation.png'],
-    },
-  ]
+  const [featuredProducts, setFeaturedProducts] = useState([])
+  const [loadingFeatured, setLoadingFeatured] = useState(false)
 
   const benefits = [
     'Premium quality materials (Maple wood, MDF, Compressed boards)',
@@ -83,11 +65,88 @@ function Home() {
     return () => clearInterval(interval)
   }, [heroImages.length])
 
+  useEffect(() => {
+    if (!supabase) {
+      setFeaturedProducts([])
+      return undefined
+    }
+
+    let mounted = true
+
+    async function loadFeaturedProducts() {
+      setLoadingFeatured(true)
+      try {
+        // First, get the featured product IDs
+        const { data: contentData, error: contentError } = await supabase
+          .from('site_content')
+          .select('content')
+          .eq('page', 'home')
+          .eq('section', 'featured_product_ids')
+          .maybeSingle()
+
+        if (!mounted) return
+
+        if (contentError) throw contentError
+
+        let featureIds = []
+        if (contentData?.content) {
+          try {
+            featureIds = JSON.parse(contentData.content)
+          } catch {
+            featureIds = []
+          }
+        }
+
+        if (featureIds.length === 0) {
+          setFeaturedProducts([])
+          setLoadingFeatured(false)
+          return
+        }
+
+        // Then, fetch all cards and filter by featured IDs
+        const { data: allCards, error: cardsError } = await supabase
+          .from('cards')
+          .select('*')
+
+        if (!mounted) return
+
+        if (cardsError) throw cardsError
+
+        if (allCards) {
+          const featured = allCards
+            .filter((card) => featureIds.includes(card.id))
+            .map((card) => ({
+              ...card,
+              images: card.image_urls?.length > 0 ? card.image_urls : card.image_url ? [card.image_url] : [],
+              image_url: card.image_urls?.[0] || card.image_url,
+              name: card.title || card.name,
+            }))
+            .sort((a, b) => featureIds.indexOf(a.id) - featureIds.indexOf(b.id))
+
+          setFeaturedProducts(featured)
+        }
+      } catch (error) {
+        console.error('Failed to load featured products:', error)
+        setFeaturedProducts([])
+      } finally {
+        setLoadingFeatured(false)
+      }
+    }
+
+    loadFeaturedProducts()
+
+    return () => {
+      mounted = false
+    }
+  }, [supabase])
+
 
   const navigateProductImage = (productId, direction) => {
     setProductImageIndices((prev) => {
       const currentIndex = prev[productId] || 0
       const product = featuredProducts.find((item) => item.id === productId)
+      if (!product || !product.images || product.images.length === 0) return prev
+
       const maxIndex = product.images.length - 1
       const newIndex = direction === 'next'
         ? currentIndex >= maxIndex ? 0 : currentIndex + 1
@@ -215,64 +274,86 @@ function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => {
-              const imageIndex = productImageIndices[product.id] || 0
-              const currentImage = product.images[imageIndex]
-              const hasMultipleImages = product.images.length > 1
+          {loadingFeatured ? (
+            <div className="flex justify-center py-12">
+              <p className="text-gray-600">Loading featured products...</p>
+            </div>
+          ) : featuredProducts.length === 0 ? (
+            <div className="rounded-lg bg-white p-12 text-center border-2 border-dashed border-primary-300">
+              <p className="text-gray-600 mb-6">No featured products selected. Create cards in Products or Gallery first.</p>
+              <EditableFeaturedProducts onFeaturedProductsChange={() => window.location.reload()} />
+            </div>
+          ) : (
+            <>
+              <div className="grid md:grid-cols-3 gap-8 mb-8">
+                {featuredProducts.map((product) => {
+                  const imageIndex = productImageIndices[product.id] || 0
+                  const currentImage = product.images?.[imageIndex] || product.image_url
+                  const hasMultipleImages = product.images && product.images.length > 1
 
-              return (
-                <div key={product.id} className="card group">
-                  <div className="relative aspect-square bg-gray-100 overflow-hidden">
-                    <img src={currentImage} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
-                    {hasMultipleImages && (
-                      <>
-                        <button
-                          onClick={(event) => {
-                            event.preventDefault()
-                            navigateProductImage(product.id, 'prev')
-                          }}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          aria-label="Previous image"
-                        >
-                          <FaChevronLeft className="text-sm" />
-                        </button>
-                        <button
-                          onClick={(event) => {
-                            event.preventDefault()
-                            navigateProductImage(product.id, 'next')
-                          }}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          aria-label="Next image"
-                        >
-                          <FaChevronRight className="text-sm" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  <div className="p-6 space-y-3">
-                    <h3 className="text-primary-800 group-hover:text-primary-600 transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-600">
-                      {product.description}
-                    </p>
-                    <Link to="/products" className="inline-flex items-center text-primary-600 font-medium hover:text-primary-700 gap-2">
-                      Learn More
-                      <FaArrowRight className="text-xs" />
-                    </Link>
-                  </div>
+                  return (
+                    <div key={product.id} className="card group">
+                      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                        {currentImage ? (
+                          <img src={currentImage} alt={product.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-200 to-primary-400">
+                            <p className="text-center text-white font-semibold">{product.name}</p>
+                          </div>
+                        )}
+                        {hasMultipleImages && (
+                          <>
+                            <button
+                              onClick={(event) => {
+                                event.preventDefault()
+                                navigateProductImage(product.id, 'prev')
+                              }}
+                              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              aria-label="Previous image"
+                            >
+                              <FaChevronLeft className="text-sm" />
+                            </button>
+                            <button
+                              onClick={(event) => {
+                                event.preventDefault()
+                                navigateProductImage(product.id, 'next')
+                              }}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              aria-label="Next image"
+                            >
+                              <FaChevronRight className="text-sm" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                      <div className="p-6 space-y-3">
+                        <h3 className="text-primary-800 group-hover:text-primary-600 transition-colors">
+                          {product.name}
+                        </h3>
+                        <p className="text-gray-600">
+                          {product.description}
+                        </p>
+                        <Link to="/products" className="inline-flex items-center text-primary-600 font-medium hover:text-primary-700 gap-2">
+                          Learn More
+                          <FaArrowRight className="text-xs" />
+                        </Link>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="text-center space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link to="/products" className="btn-primary inline-flex items-center gap-2">
+                    View All Products & Services
+                    <FaArrowRight className="text-sm" />
+                  </Link>
+                  <EditableFeaturedProducts onFeaturedProductsChange={() => window.location.reload()} />
                 </div>
-              )
-            })}
-          </div>
-
-          <div className="text-center mt-10">
-            <Link to="/products" className="btn-primary inline-flex items-center gap-2">
-              View All Products & Services
-              <FaArrowRight className="text-sm" />
-            </Link>
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
