@@ -8,6 +8,11 @@ import useAdminMode from '../hooks/useAdminMode'
 import { useCards } from '../hooks/useCards'
 import { defaultGalleryCards } from '../data/cards'
 
+const truncateModalTitle = (value, maxLength = 60) => {
+  const text = value || 'this card'
+  return text.length > maxLength ? `${text.slice(0, maxLength).trim()}...` : text
+}
+
 function Gallery() {
   const { isAdmin } = useAdminMode()
   const { cards, createCard, updateCard, deleteCard } = useCards('gallery', defaultGalleryCards)
@@ -285,7 +290,7 @@ function Gallery() {
       <ConfirmModal
         isOpen={Boolean(deletingCard)}
         title="Delete Gallery Card?"
-        message={`This will permanently delete "${deletingCard?.title || deletingCard?.name || 'this card'}" from the website. This action cannot be undone.`}
+        message={`This will permanently delete "${truncateModalTitle(deletingCard?.title || deletingCard?.name)}" from the website. This action cannot be undone.`}
         confirmLabel="Delete"
         cancelLabel="Cancel"
         loading={isDeleting}
@@ -297,12 +302,12 @@ function Gallery() {
       {expandedCard && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onClick={() => setExpandedCard(null)}>
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-gray-200 p-5">
-              <h3 className="text-2xl font-semibold text-primary-900">{expandedCard.title || expandedCard.name}</h3>
+            <div className="flex items-center justify-between gap-4 border-b border-gray-200 p-5">
+              <h3 className="min-w-0 truncate text-2xl font-semibold text-primary-900">{expandedCard.title || expandedCard.name}</h3>
               <button
                 type="button"
                 onClick={() => setExpandedCard(null)}
-                className="rounded-full p-2 text-gray-500 hover:bg-gray-100"
+                className="flex-shrink-0 rounded-full p-2 text-gray-500 hover:bg-gray-100"
                 aria-label="Close gallery details"
               >
                 <FaTimes />

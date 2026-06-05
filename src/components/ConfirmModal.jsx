@@ -16,17 +16,17 @@ function ConfirmModal({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onClick={onCancel}>
       <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-gray-200 p-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-700">
+        <div className="flex items-center justify-between gap-4 border-b border-gray-200 p-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700">
               <FaExclamationTriangle />
             </div>
-            <h3 className="text-xl font-semibold text-primary-900">{title}</h3>
+            <h3 className="truncate text-xl font-semibold text-primary-900">{title}</h3>
           </div>
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-full p-2 text-gray-500 hover:bg-gray-100"
+            className="flex-shrink-0 rounded-full p-2 text-gray-500 hover:bg-gray-100"
             aria-label="Close confirmation modal"
           >
             <FaTimes />
@@ -34,7 +34,7 @@ function ConfirmModal({
         </div>
 
         <div className="p-5">
-          <p className="text-gray-700">{message}</p>
+          <p className="break-words text-gray-700">{message}</p>
         </div>
 
         <div className="flex justify-end gap-3 border-t border-gray-200 p-5">

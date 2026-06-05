@@ -522,12 +522,12 @@ function Home() {
       {expandedCard && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onClick={() => setExpandedCard(null)}>
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-gray-200 p-5">
-              <h3 className="text-2xl font-semibold text-primary-900">{expandedCard.title || expandedCard.name}</h3>
+            <div className="flex items-center justify-between gap-4 border-b border-gray-200 p-5">
+              <h3 className="min-w-0 truncate text-2xl font-semibold text-primary-900">{expandedCard.title || expandedCard.name}</h3>
               <button
                 type="button"
                 onClick={() => setExpandedCard(null)}
-                className="rounded-full p-2 text-gray-500 hover:bg-gray-100"
+                className="flex-shrink-0 rounded-full p-2 text-gray-500 hover:bg-gray-100"
                 aria-label="Close product details"
               >
                 <FaTimes />
