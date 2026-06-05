@@ -75,7 +75,7 @@ function Header() {
               className="w-12 h-12 rounded-lg transform group-hover:rotate-6 transition-transform duration-300"
             />
             <div>
-              <h1 className="text-2xl font-bold text-primary-800 tracking-tight">
+              <h1 className="text-2xl font-bold text-wood-dark tracking-tight">
                 OAKTIMBER
               </h1>
               <p className="text-xs text-primary-600 font-medium">
@@ -92,7 +92,7 @@ function Header() {
                 to={item.path}
                 className={`font-medium transition-colors duration-200 hover:text-primary-600 ${
                   getIsActive(item.path)
-                    ? 'text-primary-600 border-b-2 border-primary-600 pb-1'
+                    ? 'text-primary-600 border-b-2 border-accent-orange pb-1'
                     : 'text-gray-700'
                 }`}
               >

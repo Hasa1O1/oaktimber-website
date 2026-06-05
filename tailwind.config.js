@@ -6,29 +6,32 @@ export default {
   ],
   theme: {
     extend: {
-      // Custom color palette inspired by wood and natural tones
+      // OAKTIMBER brand palette from the visual guidelines.
       colors: {
         primary: {
-          50: '#faf8f5',
-          100: '#f5f0e8',
-          200: '#e8dcc5',
-          300: '#d4bc92',
-          400: '#c19a5f',
-          500: '#a87c3f',
-          600: '#8b6534',
-          700: '#6e4e2a',
-          800: '#523a1f',
-          900: '#362615',
+          50: '#eefbf4',
+          100: '#d7f4e5',
+          200: '#afe9cc',
+          300: '#78d8a9',
+          400: '#35bb77',
+          500: '#009444',
+          600: '#007a38',
+          700: '#00632f',
+          800: '#004d40',
+          900: '#00382f',
         },
         wood: {
-          light: '#e8dcc5',
-          medium: '#c19a5f',
-          dark: '#6e4e2a',
+          light: '#B5834C',
+          medium: '#7a4b1f',
+          dark: '#603913',
         },
         accent: {
-          cream: '#faf8f5',
-          beige: '#e8dcc5',
-          brown: '#8b6534',
+          cream: '#fbfaf7',
+          beige: '#efe4d6',
+          brown: '#603913',
+          orange: '#F7921E',
+          teal: '#004D40',
+          gray: '#B5834C',
         }
       },
       fontFamily: {

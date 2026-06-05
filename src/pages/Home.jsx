@@ -198,13 +198,13 @@ function Home() {
     <div className="min-h-screen">
       {!heroImagesLoaded ? null : (
       <>
-      <section className="relative bg-gradient-to-br from-primary-50 via-accent-cream to-primary-100 section-padding">
+      <section className="relative bg-gradient-to-br from-accent-cream via-white to-primary-100 section-padding">
         <div className="container-custom">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 animate-fade-in">
-              <h1 className="text-primary-900 leading-tight">
+              <h1 className="text-wood-dark leading-tight">
                 <EditableText page="home" section="hero_title" defaultValue="Crafting Timeless" />
-                <span className="block text-primary-600">
+                <span className="block text-primary-500">
                   <EditableText page="home" section="hero_highlight" defaultValue="Wooden Masterpieces" />
                 </span>
               </h1>
@@ -229,7 +229,7 @@ function Home() {
 
               <div className="flex flex-wrap gap-6 pt-6 border-t border-primary-200">
                 <div>
-                  <p className="text-3xl font-bold text-primary-700">
+                  <p className="text-3xl font-bold text-accent-orange">
                     <EditableText page="home" section="stat_projects_value" defaultValue="100+" />
                   </p>
                   <p className="text-sm text-gray-600">
@@ -237,7 +237,7 @@ function Home() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-primary-700">
+                  <p className="text-3xl font-bold text-accent-orange">
                     <EditableText page="home" section="stat_clients_value" defaultValue="50+" />
                   </p>
                   <p className="text-sm text-gray-600">
@@ -245,7 +245,7 @@ function Home() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-primary-700">
+                  <p className="text-3xl font-bold text-accent-orange">
                     <EditableText page="home" section="stat_rating_value" defaultValue="5 Star" />
                   </p>
                   <p className="text-sm text-gray-600">
@@ -268,8 +268,8 @@ function Home() {
                   <img src={image} alt="OAKTIMBER craftsmanship" className="w-full h-full object-cover" />
                 </div>
               ))}
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-600 rounded-2xl opacity-20 -z-10"></div>
-              <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary-400 rounded-full opacity-20 -z-10"></div>
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-accent-brown rounded-2xl opacity-20 -z-10"></div>
+              <div className="absolute -top-6 -left-6 w-24 h-24 bg-accent-orange rounded-full opacity-20 -z-10"></div>
             </div>
             <EditableHeroImages page="home" section="hero_images" defaultImages={heroImages} />
           </div>
@@ -279,7 +279,7 @@ function Home() {
       <section className="section-padding bg-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h2 className="text-primary-900 animate-slide-up">
+            <h2 className="text-wood-dark animate-slide-up">
               <EditableText page="home" section="welcome_title" defaultValue="Welcome to OAKTIMBER" />
             </h2>
             <p className="text-lg text-gray-700 leading-relaxed">
@@ -298,10 +298,10 @@ function Home() {
         </div>
       </section>
 
-      <section className="section-padding bg-primary-50">
+      <section className="section-padding bg-accent-cream">
         <div className="container-custom">
           <div className="text-center mb-12">
-            <h2 className="text-primary-900 mb-4">
+            <h2 className="text-wood-dark mb-4">
               <EditableText page="home" section="featured_title" defaultValue="Featured Products & Services" />
             </h2>
             <p className="text-lg text-gray-700 max-w-2xl mx-auto">
@@ -377,7 +377,7 @@ function Home() {
                           )}
                         </div>
                       ) : (
-                        <div className="h-64 flex-shrink-0 bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
+                        <div className="h-64 flex-shrink-0 bg-gradient-to-br from-accent-brown to-primary-700 flex items-center justify-center">
                           <div className="text-center text-white p-4">
                             <p className="font-semibold">{product.title || product.name}</p>
                             <p className="text-sm opacity-90 mt-1">Product Image</p>
@@ -393,11 +393,11 @@ function Home() {
                           className="h-[248px] overflow-hidden"
                         >
                           <div className="flex items-start justify-between">
-                            <h3 className="text-primary-800">
+                            <h3 className="text-wood-dark">
                               {product.title || product.name}
                             </h3>
                             {product.price && (
-                              <span className="text-xl font-bold text-primary-600">
+                              <span className="text-xl font-bold text-accent-orange">
                                 {product.price}
                               </span>
                             )}
@@ -461,11 +461,11 @@ function Home() {
                 defaultValue="/images/why choose us image..jpg"
                 alt="OAKTIMBER workshop and craftsmanship"
               />
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary-400 rounded-2xl opacity-20 -z-10"></div>
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-accent-orange rounded-2xl opacity-20 -z-10"></div>
             </div>
 
             <div className="space-y-6">
-              <h2 className="text-primary-900">
+              <h2 className="text-wood-dark">
                 <EditableText page="home" section="why_title" defaultValue="Why Choose OAKTIMBER?" />
               </h2>
               <p className="text-gray-700 text-lg">
@@ -493,12 +493,12 @@ function Home() {
         </div>
       </section>
 
-      <section className="section-padding bg-gradient-to-r from-primary-600 to-primary-800 text-white">
+      <section className="section-padding bg-gradient-to-r from-accent-teal via-primary-700 to-primary-500 text-white">
         <div className="container-custom text-center">
           <h2 className="text-white mb-6">
             <EditableText page="home" section="cta_title" defaultValue="Ready to Transform Your Space?" />
           </h2>
-          <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-primary-50 mb-8 max-w-2xl mx-auto">
             <EditableText
               page="home"
               section="cta_text"
@@ -511,7 +511,7 @@ function Home() {
               Contact Us Now
               <FaArrowRight />
             </Link>
-            <Link to="/gallery" className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary-700 transition-all duration-300 inline-flex items-center justify-center">
+            <Link to="/gallery" className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-wood-dark transition-all duration-300 inline-flex items-center justify-center">
               View Gallery
             </Link>
           </div>

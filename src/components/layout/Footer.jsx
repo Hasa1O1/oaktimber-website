@@ -23,11 +23,11 @@ function Footer() {
   const instagram = useSiteContent('footer', 'instagram_url', 'https://www.instagram.com/oaktimber_zambia?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==')
 
   return (
-    <footer className="bg-primary-900 text-white">
+    <footer className="bg-accent-teal text-white">
       <div className="container-custom px-4 md:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
-            <p className="text-primary-200 text-sm leading-relaxed">
+            <p className="text-primary-100 text-sm leading-relaxed">
               <EditableText
                 page="footer"
                 section="company_text"
@@ -38,55 +38,55 @@ function Footer() {
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-primary-100">
+            <h4 className="text-lg font-semibold mb-4 text-white">
               <EditableText page="footer" section="quick_links_title" defaultValue="Quick Links" />
             </h4>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-primary-200 hover:text-white transition-colors">Home</Link></li>
-              <li><Link to="/about" className="text-primary-200 hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/products" className="text-primary-200 hover:text-white transition-colors">Products & Services</Link></li>
-              <li><Link to="/gallery" className="text-primary-200 hover:text-white transition-colors">Gallery</Link></li>
-              <li><Link to="/contact" className="text-primary-200 hover:text-white transition-colors">Contact</Link></li>
+              <li><Link to="/" className="text-primary-100 hover:text-accent-orange transition-colors">Home</Link></li>
+              <li><Link to="/about" className="text-primary-100 hover:text-accent-orange transition-colors">About Us</Link></li>
+              <li><Link to="/products" className="text-primary-100 hover:text-accent-orange transition-colors">Products & Services</Link></li>
+              <li><Link to="/gallery" className="text-primary-100 hover:text-accent-orange transition-colors">Gallery</Link></li>
+              <li><Link to="/contact" className="text-primary-100 hover:text-accent-orange transition-colors">Contact</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-lg font-semibold mb-4 text-primary-100">
+            <h4 className="text-lg font-semibold mb-4 text-white">
               <EditableText page="footer" section="contact_title" defaultValue="Contact Us" />
             </h4>
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
-                <FaPhone className="text-primary-400 mt-1 flex-shrink-0" />
+                <FaPhone className="text-accent-orange mt-1 flex-shrink-0" />
                 <div>
-                  <p className="text-sm text-primary-200">Phone</p>
-                  <a href={phoneHref(phone)} className="text-white hover:text-primary-300 transition-colors">
+                  <p className="text-sm text-primary-100">Phone</p>
+                  <a href={phoneHref(phone)} className="text-white hover:text-accent-orange transition-colors">
                     <EditableText page="contact" section="phone" defaultValue="0973 131 425" />
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start space-x-3">
-                <FaEnvelope className="text-primary-400 mt-1 flex-shrink-0" />
+                <FaEnvelope className="text-accent-orange mt-1 flex-shrink-0" />
                 <div>
-                  <p className="text-sm text-primary-200">Email</p>
-                  <a href={`mailto:${email}`} className="text-white hover:text-primary-300 transition-colors break-all">
+                  <p className="text-sm text-primary-100">Email</p>
+                  <a href={`mailto:${email}`} className="text-white hover:text-accent-orange transition-colors break-all">
                     <EditableText page="contact" section="email" defaultValue="Dinganipeleka15@gmail.com" />
                   </a>
                 </div>
               </div>
 
               <div>
-                <p className="text-sm text-primary-200 mb-2">
+                <p className="text-sm text-primary-100 mb-2">
                   <EditableText page="footer" section="follow_title" defaultValue="Follow Us" />
                 </p>
                 <div className="flex space-x-4">
-                  <a href={whatsappHref(whatsapp)} target="_blank" rel="noopener noreferrer" className="text-primary-300 hover:text-white transition-colors text-xl" aria-label="WhatsApp">
+                  <a href={whatsappHref(whatsapp)} target="_blank" rel="noopener noreferrer" className="text-primary-200 hover:text-accent-orange transition-colors text-xl" aria-label="WhatsApp">
                     <FaWhatsapp />
                   </a>
-                  <a href={facebook} target="_blank" rel="noopener noreferrer" className="text-primary-300 hover:text-white transition-colors text-xl" aria-label="Facebook">
+                  <a href={facebook} target="_blank" rel="noopener noreferrer" className="text-primary-200 hover:text-accent-orange transition-colors text-xl" aria-label="Facebook">
                     <FaFacebook />
                   </a>
-                  <a href={instagram} target="_blank" rel="noopener noreferrer" className="text-primary-300 hover:text-white transition-colors text-xl" aria-label="Instagram">
+                  <a href={instagram} target="_blank" rel="noopener noreferrer" className="text-primary-200 hover:text-accent-orange transition-colors text-xl" aria-label="Instagram">
                     <FaInstagram />
                   </a>
                 </div>
@@ -96,9 +96,9 @@ function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-primary-800">
+      <div className="border-t border-white/10">
         <div className="container-custom px-4 md:px-8 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-primary-300">
+          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-primary-100">
             <p>© {currentYear} OAKTIMBER. All rights reserved.</p>
             <p className="mt-2 md:mt-0">
               Owned by <EditableText page="contact" section="owner" defaultValue={owner} />

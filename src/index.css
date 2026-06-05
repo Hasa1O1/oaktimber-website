@@ -10,7 +10,7 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif;
+    @apply font-serif text-wood-dark;
   }
   
   h1 {
@@ -29,15 +29,15 @@
 /* Custom component styles */
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+    @apply px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg transition-all duration-300 shadow-md shadow-primary-900/10 hover:shadow-lg hover:shadow-primary-900/20 transform hover:-translate-y-0.5;
   }
   
   .btn-secondary {
-    @apply px-6 py-3 bg-transparent border-2 border-primary-600 text-primary-700 hover:bg-primary-600 hover:text-white font-semibold rounded-lg transition-all duration-300;
+    @apply px-6 py-3 bg-transparent border-2 border-wood-dark text-wood-dark hover:bg-wood-dark hover:text-white font-semibold rounded-lg transition-all duration-300;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden;
+    @apply bg-white rounded-lg border border-primary-100 shadow-md shadow-primary-900/5 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/10 transition-all duration-300 overflow-hidden;
   }
   
   .section-padding {
@@ -60,16 +60,16 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f5f0e8;
+  background: #fbfaf7;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #8b6534;
+  background: #603913;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6e4e2a;
+  background: #009444;
 }
 
 .line-clamp-2 {
