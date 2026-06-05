@@ -5,15 +5,11 @@ import useAdminMode from '../hooks/useAdminMode'
 
 function EditableImage({ page, section, defaultValue, alt = '' }) {
   const { isAdmin, supabase } = useAdminMode()
-  const [imageUrl, setImageUrl] = useState(defaultValue)
-  const [draft, setDraft] = useState(defaultValue)
+  const [imageUrl, setImageUrl] = useState(null)
+  const [draft, setDraft] = useState(null)
   const [open, setOpen] = useState(false)
   const [uploading, setUploading] = useState(false)
-
-  useEffect(() => {
-    setImageUrl(defaultValue)
-    setDraft(defaultValue)
-  }, [defaultValue])
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (!supabase) return undefined
@@ -33,7 +29,12 @@ function EditableImage({ page, section, defaultValue, alt = '' }) {
       if (!error && typeof data?.content === 'string' && data.content.trim() !== '') {
         setImageUrl(data.content)
         setDraft(data.content)
+      } else {
+        // Only use fallback if database is empty
+        setImageUrl(defaultValue)
+        setDraft(defaultValue)
       }
+      setLoaded(true)
     }
 
     loadContent()
@@ -41,7 +42,7 @@ function EditableImage({ page, section, defaultValue, alt = '' }) {
     return () => {
       mounted = false
     }
-  }, [page, section, supabase])
+  }, [page, section, supabase, defaultValue])
 
   async function handleUpload(event) {
     const file = event.target.files?.[0]
@@ -99,6 +100,10 @@ function EditableImage({ page, section, defaultValue, alt = '' }) {
     setImageUrl(draft)
     setOpen(false)
     toast.success('Image updated')
+  }
+
+  if (!loaded) {
+    return null
   }
 
   if (!isAdmin) {

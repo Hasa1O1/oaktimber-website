@@ -6,14 +6,10 @@ import useAdminMode from '../hooks/useAdminMode'
 function EditableText({ page, section, defaultValue, multiline = false }) {
   const { isAdmin, supabase } = useAdminMode()
   const fallbackValue = typeof defaultValue === 'string' ? defaultValue : String(defaultValue ?? '')
-  const [value, setValue] = useState(fallbackValue)
-  const [draft, setDraft] = useState(fallbackValue)
+  const [value, setValue] = useState(null)
+  const [draft, setDraft] = useState(null)
   const [open, setOpen] = useState(false)
-
-  useEffect(() => {
-    setValue(fallbackValue)
-    setDraft(fallbackValue)
-  }, [fallbackValue])
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (!supabase) return undefined
@@ -33,7 +29,12 @@ function EditableText({ page, section, defaultValue, multiline = false }) {
       if (!error && typeof data?.content === 'string' && data.content.trim() !== '') {
         setValue(data.content)
         setDraft(data.content)
+      } else {
+        // Only use fallback if database is empty
+        setValue(fallbackValue)
+        setDraft(fallbackValue)
       }
+      setLoaded(true)
     }
 
     loadContent()
@@ -41,7 +42,7 @@ function EditableText({ page, section, defaultValue, multiline = false }) {
     return () => {
       mounted = false
     }
-  }, [page, section, supabase])
+  }, [page, section, supabase, fallbackValue])
 
   async function handleSave() {
     if (!supabase) return
@@ -66,6 +67,10 @@ function EditableText({ page, section, defaultValue, multiline = false }) {
     setValue(draft)
     setOpen(false)
     toast.success('Text updated')
+  }
+
+  if (!loaded) {
+    return null
   }
 
   if (!isAdmin) {

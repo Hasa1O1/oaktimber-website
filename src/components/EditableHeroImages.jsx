@@ -5,15 +5,11 @@ import useAdminMode from '../hooks/useAdminMode'
 
 function EditableHeroImages({ page, section, defaultImages = [] }) {
   const { isAdmin, supabase } = useAdminMode()
-  const [images, setImages] = useState(defaultImages)
-  const [draft, setDraft] = useState(defaultImages)
+  const [images, setImages] = useState(null)
+  const [draft, setDraft] = useState(null)
   const [open, setOpen] = useState(false)
   const [uploading, setUploading] = useState(false)
-
-  useEffect(() => {
-    setImages(defaultImages)
-    setDraft(defaultImages)
-  }, [defaultImages])
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (!supabase) return undefined
@@ -36,11 +32,17 @@ function EditableHeroImages({ page, section, defaultImages = [] }) {
           if (Array.isArray(parsed) && parsed.length > 0) {
             setImages(parsed)
             setDraft(parsed)
+            setLoaded(true)
+            return
           }
         } catch {
           // Fall back to default if JSON parsing fails
         }
       }
+      // Only use fallback if database is empty
+      setImages(defaultImages)
+      setDraft(defaultImages)
+      setLoaded(true)
     }
 
     loadContent()
@@ -48,7 +50,7 @@ function EditableHeroImages({ page, section, defaultImages = [] }) {
     return () => {
       mounted = false
     }
-  }, [page, section, supabase])
+  }, [page, section, supabase, defaultImages])
 
   async function handleUpload(event) {
     const file = event.target.files?.[0]
@@ -123,6 +125,10 @@ function EditableHeroImages({ page, section, defaultImages = [] }) {
     setImages(draft)
     setOpen(false)
     toast.success('Hero images updated')
+  }
+
+  if (!loaded) {
+    return null
   }
 
   if (!isAdmin) {

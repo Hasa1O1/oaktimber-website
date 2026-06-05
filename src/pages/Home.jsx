@@ -11,7 +11,8 @@ function Home() {
   const { supabase } = useAdminMode()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [productImageIndices, setProductImageIndices] = useState({})
-  const [heroImages, setHeroImages] = useState(['/images/hero image 3.png', '/images/hero image 2.png', '/images/hero image 1.jpg'])
+  const [heroImages, setHeroImages] = useState(null)
+  const [heroImagesLoaded, setHeroImagesLoaded] = useState(false)
   const [featuredProducts, setFeaturedProducts] = useState([])
   const [loadingFeatured, setLoadingFeatured] = useState(false)
 
@@ -25,7 +26,11 @@ function Home() {
   ]
 
   useEffect(() => {
-    if (!supabase) return undefined
+    if (!supabase) {
+      setHeroImages(['/images/hero image 3.png', '/images/hero image 2.png', '/images/hero image 1.jpg'])
+      setHeroImagesLoaded(true)
+      return undefined
+    }
 
     let mounted = true
 
@@ -44,11 +49,16 @@ function Home() {
           const parsed = JSON.parse(data.content)
           if (Array.isArray(parsed) && parsed.length > 0) {
             setHeroImages(parsed)
+            setHeroImagesLoaded(true)
+            return
           }
         } catch {
           // Fall back to default if JSON parsing fails
         }
       }
+      // Only use fallback if database is empty
+      setHeroImages(['/images/hero image 3.png', '/images/hero image 2.png', '/images/hero image 1.jpg'])
+      setHeroImagesLoaded(true)
     }
 
     loadHeroImages()
@@ -158,6 +168,8 @@ function Home() {
 
   return (
     <div className="min-h-screen">
+      {!heroImagesLoaded ? null : (
+      <>
       <section className="relative bg-gradient-to-br from-primary-50 via-accent-cream to-primary-100 section-padding">
         <div className="container-custom">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -423,6 +435,8 @@ function Home() {
           </div>
         </div>
       </section>
+      </>
+      )}
     </div>
   )
 }
