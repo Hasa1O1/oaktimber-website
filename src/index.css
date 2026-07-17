@@ -37,7 +37,19 @@
   }
   
   .card {
-    @apply bg-white rounded-lg border border-primary-100 shadow-md shadow-primary-900/5 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/10 transition-all duration-300 overflow-hidden;
+    @apply bg-white rounded-2xl border border-primary-100 shadow-md shadow-primary-900/5 hover:border-primary-200 hover:shadow-xl hover:shadow-primary-900/10 transition-all duration-300 overflow-hidden;
+  }
+
+  .card-overlay {
+    @apply relative h-full min-h-[400px] rounded-2xl overflow-hidden;
+  }
+
+  .card-overlay img {
+    @apply w-full h-full object-cover;
+  }
+
+  .card-overlay-content {
+    @apply absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-between p-6;
   }
   
   .section-padding {

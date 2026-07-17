@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTimes, FaTrash } from 'react-icons/fa'
+import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTimes, FaTrash, FaShoppingBag } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import EditableText from '../components/EditableText'
 import CardModal from '../components/CardModal'
@@ -171,7 +171,7 @@ function Products() {
               const hasMultipleImages = product.images && product.images.length > 1
 
               return (
-                <div key={product.id} className="card animate-fade-in group relative flex h-[620px] flex-col">
+                <div key={product.id} className="card-overlay animate-fade-in group relative h-[500px]">
                   {isAdmin && (
                     <div className="absolute right-3 top-3 z-30 flex gap-2">
                       <button
@@ -194,50 +194,13 @@ function Products() {
                   )}
 
                   {currentImage ? (
-                    <div className="relative h-64 flex-shrink-0 bg-gray-100 overflow-hidden">
-                      <img
-                        src={currentImage}
-                        alt={product.title || product.name}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                      />
-
-                      {hasMultipleImages && (
-                        <>
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault()
-                              navigateProductImage(product.id, 'prev')
-                            }}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                            aria-label="Previous image"
-                          >
-                            <FaChevronLeft className="text-sm" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault()
-                              navigateProductImage(product.id, 'next')
-                            }}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                            aria-label="Next image"
-                          >
-                            <FaChevronRight className="text-sm" />
-                          </button>
-                          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1">
-                            {product.images.map((_, index) => (
-                              <div
-                                key={index}
-                                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                                  index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
+                    <img
+                      src={currentImage}
+                      alt={product.title || product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   ) : (
-                    <div className="h-64 flex-shrink-0 bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
+                    <div className="w-full h-full bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
                       <div className="text-center text-white p-4">
                         <p className="font-semibold">{product.title || product.name}</p>
                         <p className="text-sm opacity-90 mt-1">Product Image</p>
@@ -245,52 +208,62 @@ function Products() {
                     </div>
                   )}
 
-                  <div className="flex min-h-0 flex-1 flex-col p-6">
+                  <div className="card-overlay-content">
+                    <div className="flex justify-between items-start">
+                      {product.featured && (
+                        <span className="bg-black/80 text-white px-3 py-1 rounded-full text-sm font-medium">
+                          Top Pick
+                        </span>
+                      )}
+                      <button className="text-white hover:text-white/80 transition-colors">
+                        <FaShoppingBag className="text-xl" />
+                      </button>
+                    </div>
+
                     <div
                       ref={(element) => {
                         cardTextRefs.current[product.id] = element
                       }}
-                      className="h-[248px] overflow-hidden"
+                      className="flex-1 overflow-hidden"
                     >
-                      <div className="flex items-start justify-between">
-                        <h3 className="text-primary-800">
-                          {product.title || product.name}
-                        </h3>
-                        {product.price && (
-                          <span className="text-xl font-bold text-primary-600">
-                            {product.price}
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-3 text-gray-600">
+                      <h3 className="text-white text-2xl font-bold mb-2">
+                        {product.title || product.name}
+                      </h3>
+                      {product.price && (
+                        <span className="text-xl font-bold text-white mb-3 block">
+                          {product.price}
+                        </span>
+                      )}
+                      <p className="text-white/90 text-sm line-clamp-3">
                         {product.description}
                       </p>
 
-                      <ul className="mt-4 space-y-2">
-                        {(product.features || []).map((feature, index) => (
-                          <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
-                            <div className="mt-1 flex-shrink-0">
-                              <div className="w-4 h-4 rounded-full bg-primary-100 flex items-center justify-center">
-                                <FaCheck className="text-primary-600 text-xs" />
-                              </div>
+                      {hasMultipleImages && (
+                        <div className="flex gap-2 mt-3">
+                          {product.images.map((_, index) => (
+                            <div
+                              key={index}
+                              onClick={() => {
+                                setProductImageIndices((prev) => ({ ...prev, [product.id]: index }))
+                              }}
+                              className={`cursor-pointer w-8 h-8 rounded-full overflow-hidden border-2 transition-all ${
+                                index === currentImageIndex ? 'border-white' : 'border-transparent'
+                              }`}
+                            >
+                              <img
+                                src={product.images[index]}
+                                alt={`Thumbnail ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    {overflowingCards[product.id] && (
-                      <div className="mt-auto pt-4">
-                        <button
-                          type="button"
-                          onClick={() => setExpandedCard(product)}
-                          className="font-semibold text-primary-600 hover:text-primary-700"
-                        >
-                          Read More
-                        </button>
-                      </div>
-                    )}
+                    <button className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-100 transition-colors mt-4">
+                      Add to Cart
+                    </button>
                   </div>
                 </div>
               )
