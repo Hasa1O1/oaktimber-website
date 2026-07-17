@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTimes, FaTrash, FaShoppingBag } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import EditableText from '../components/EditableText'
@@ -23,8 +23,6 @@ function Products() {
   const [expandedCard, setExpandedCard] = useState(null)
   const [isCardModalOpen, setIsCardModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [overflowingCards, setOverflowingCards] = useState({})
-  const cardTextRefs = useRef({})
 
   const categories = [
     { id: 'all', name: 'All Products' },
@@ -38,29 +36,6 @@ function Products() {
       ? products
       : products.filter((product) => product.category === activeCategory)
   ), [activeCategory, products])
-
-  useEffect(() => {
-    const measureOverflow = () => {
-      const nextOverflowingCards = {}
-
-      filteredProducts.forEach((product) => {
-        const element = cardTextRefs.current[product.id]
-        if (!element) return
-
-        nextOverflowingCards[product.id] = element.scrollHeight > element.clientHeight + 1
-      })
-
-      setOverflowingCards(nextOverflowingCards)
-    }
-
-    const frame = requestAnimationFrame(measureOverflow)
-    window.addEventListener('resize', measureOverflow)
-
-    return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('resize', measureOverflow)
-    }
-  }, [filteredProducts])
 
   const navigateProductImage = (productId, direction) => {
     setProductImageIndices((prev) => {
@@ -220,12 +195,7 @@ function Products() {
                       </button>
                     </div>
 
-                    <div
-                      ref={(element) => {
-                        cardTextRefs.current[product.id] = element
-                      }}
-                      className="flex-1 overflow-hidden"
-                    >
+                    <div className="flex-1 overflow-hidden">
                       <h3 className="text-white text-2xl font-bold mb-2 line-clamp-1">
                         {product.title || product.name}
                       </h3>
@@ -261,7 +231,7 @@ function Products() {
                       )}
                     </div>
 
-                    {overflowingCards[product.id] && (
+                    {(product.description || (product.features && product.features.length > 0)) && (
                       <button
                         type="button"
                         onClick={() => setExpandedCard(product)}

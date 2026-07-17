@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTimes, FaTrash, FaShoppingBag } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import EditableText from '../components/EditableText'
@@ -22,8 +22,6 @@ function Gallery() {
   const [isCardModalOpen, setIsCardModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [expandedCard, setExpandedCard] = useState(null)
-  const [overflowingCards, setOverflowingCards] = useState({})
-  const cardTextRefs = useRef({})
 
   function openCreateModal() {
     setEditingCard(null)
@@ -73,29 +71,6 @@ function Gallery() {
       return { ...prev, [cardId]: newIndex }
     })
   }
-
-  useEffect(() => {
-    const measureOverflow = () => {
-      const nextOverflowingCards = {}
-
-      cards.forEach((card) => {
-        const element = cardTextRefs.current[card.id]
-        if (!element) return
-
-        nextOverflowingCards[card.id] = element.scrollHeight > element.clientHeight + 1
-      })
-
-      setOverflowingCards(nextOverflowingCards)
-    }
-
-    const frame = requestAnimationFrame(measureOverflow)
-    window.addEventListener('resize', measureOverflow)
-
-    return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('resize', measureOverflow)
-    }
-  }, [cards])
 
   return (
     <div className="min-h-screen">
@@ -186,12 +161,7 @@ function Gallery() {
                       </button>
                     </div>
 
-                    <div
-                      ref={(element) => {
-                        cardTextRefs.current[card.id] = element
-                      }}
-                      className="flex-1 overflow-hidden"
-                    >
+                    <div className="flex-1 overflow-hidden">
                       <h3 className="text-white text-2xl font-bold mb-2 line-clamp-1">
                         {card.title || card.name}
                       </h3>
@@ -222,7 +192,7 @@ function Gallery() {
                       )}
                     </div>
 
-                    {overflowingCards[card.id] && (
+                    {(card.description || (card.features && card.features.length > 0)) && (
                       <button
                         type="button"
                         onClick={() => setExpandedCard(card)}

@@ -75,8 +75,11 @@ function EditableFeaturedProducts({ onFeaturedProductsChange }) {
 
   function toggleCardSelection(cardId) {
     setSelectedCardIds((prev) => {
-      if (prev.includes(cardId)) {
-        return prev.filter((id) => id !== cardId)
+      const idStr = String(cardId)
+      const prevStr = prev.map(String)
+      
+      if (prevStr.includes(idStr)) {
+        return prev.filter((id) => String(id) !== idStr)
       }
       if (prev.length < 3) {
         return [...prev, cardId]

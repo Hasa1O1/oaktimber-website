@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaArrowRight, FaCheck, FaChevronLeft, FaChevronRight, FaTimes, FaShoppingBag } from 'react-icons/fa'
 import EditableText from '../components/EditableText'
@@ -16,8 +16,6 @@ function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([])
   const [loadingFeatured, setLoadingFeatured] = useState(false)
   const [expandedCard, setExpandedCard] = useState(null)
-  const [overflowingCards, setOverflowingCards] = useState({})
-  const cardTextRefs = useRef({})
 
   const benefits = [
     'Premium quality materials (Maple wood, MDF, Compressed boards)',
@@ -154,30 +152,6 @@ function Home() {
       mounted = false
     }
   }, [supabase])
-
-  useEffect(() => {
-    const measureOverflow = () => {
-      const nextOverflowingCards = {}
-
-      featuredProducts.forEach((product) => {
-        const element = cardTextRefs.current[product.id]
-        if (!element) return
-
-        nextOverflowingCards[product.id] = element.scrollHeight > element.clientHeight + 1
-      })
-
-      setOverflowingCards(nextOverflowingCards)
-    }
-
-    const frame = requestAnimationFrame(measureOverflow)
-    window.addEventListener('resize', measureOverflow)
-
-    return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('resize', measureOverflow)
-    }
-  }, [featuredProducts])
-
 
   const navigateProductImage = (productId, direction) => {
     setProductImageIndices((prev) => {
@@ -360,12 +334,7 @@ function Home() {
                           </button>
                         </div>
 
-                        <div
-                          ref={(element) => {
-                            cardTextRefs.current[product.id] = element
-                          }}
-                          className="flex-1 overflow-hidden"
-                        >
+                        <div className="flex-1 overflow-hidden">
                           <h3 className="text-white text-2xl font-bold mb-2 line-clamp-1">
                             {product.title || product.name}
                           </h3>
@@ -401,7 +370,7 @@ function Home() {
                           )}
                         </div>
 
-                        {overflowingCards[product.id] && (
+                        {(product.description || (product.features && product.features.length > 0)) && (
                           <button
                             type="button"
                             onClick={() => setExpandedCard(product)}
