@@ -192,7 +192,7 @@ function Gallery() {
                       }}
                       className="flex-1 overflow-hidden"
                     >
-                      <h3 className="text-white text-2xl font-bold mb-2">
+                      <h3 className="text-white text-2xl font-bold mb-2 line-clamp-1">
                         {card.title || card.name}
                       </h3>
                       <p className="text-white/90 text-sm line-clamp-3">

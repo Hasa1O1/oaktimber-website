@@ -366,7 +366,7 @@ function Home() {
                           }}
                           className="flex-1 overflow-hidden"
                         >
-                          <h3 className="text-white text-2xl font-bold mb-2">
+                          <h3 className="text-white text-2xl font-bold mb-2 line-clamp-1">
                             {product.title || product.name}
                           </h3>
                           {product.price && (
