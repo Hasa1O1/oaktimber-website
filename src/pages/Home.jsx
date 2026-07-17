@@ -401,9 +401,15 @@ function Home() {
                           )}
                         </div>
 
-                        <button className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-100 transition-colors mt-4">
-                          Add to Cart
-                        </button>
+                        {overflowingCards[product.id] && (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedCard(product)}
+                            className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-100 transition-colors mt-4"
+                          >
+                            Read More
+                          </button>
+                        )}
                       </div>
                     </div>
                   )
