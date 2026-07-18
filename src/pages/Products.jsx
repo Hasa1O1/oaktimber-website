@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaCheck, FaChevronLeft, FaChevronRight, FaPencilAlt, FaPlus, FaTimes, FaTrash, FaShoppingBag } from 'react-icons/fa'
 import { toast } from 'react-hot-toast'
 import EditableText from '../components/EditableText'
@@ -16,26 +16,12 @@ const truncateModalTitle = (value, maxLength = 60) => {
 function Products() {
   const { isAdmin } = useAdminMode()
   const { cards: products, createCard, updateCard, deleteCard } = useCards('products', defaultProductCards)
-  const [activeCategory, setActiveCategory] = useState('all')
   const [productImageIndices, setProductImageIndices] = useState({})
   const [editingCard, setEditingCard] = useState(null)
   const [deletingCard, setDeletingCard] = useState(null)
   const [expandedCard, setExpandedCard] = useState(null)
   const [isCardModalOpen, setIsCardModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-
-  const categories = [
-    { id: 'all', name: 'All Products' },
-    { id: 'furniture', name: 'Furniture' },
-    { id: 'installations', name: 'Installations' },
-    { id: 'services', name: 'Services' },
-  ]
-
-  const filteredProducts = useMemo(() => (
-    activeCategory === 'all'
-      ? products
-      : products.filter((product) => product.category === activeCategory)
-  ), [activeCategory, products])
 
   const navigateProductImage = (productId, direction) => {
     setProductImageIndices((prev) => {
@@ -104,26 +90,6 @@ function Products() {
         </div>
       </section>
 
-      <section className="bg-white py-8 sticky top-20 z-40 shadow-sm">
-        <div className="container-custom">
-          <div className="flex flex-wrap justify-center gap-4">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
-                  activeCategory === category.id
-                    ? 'bg-primary-600 text-white shadow-md'
-                    : 'bg-primary-50 text-primary-700 hover:bg-primary-100'
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="section-padding bg-accent-cream">
         <div className="container-custom">
           {isAdmin && (
@@ -140,7 +106,7 @@ function Products() {
           )}
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => {
+            {products.map((product) => {
               const currentImageIndex = productImageIndices[product.id] || 0
               const currentImage = product.images ? product.images[currentImageIndex] : product.image_url
               const hasMultipleImages = product.images && product.images.length > 1
@@ -262,9 +228,9 @@ function Products() {
             })}
           </div>
 
-          {filteredProducts.length === 0 && (
+          {products.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-xl text-gray-600">No products found in this category.</p>
+              <p className="text-xl text-gray-600">No products found.</p>
             </div>
           )}
         </div>
