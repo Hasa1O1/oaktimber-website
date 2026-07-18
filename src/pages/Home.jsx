@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaArrowRight, FaCheck, FaChevronLeft, FaChevronRight, FaTimes, FaShoppingBag } from 'react-icons/fa'
 import EditableText from '../components/EditableText'
