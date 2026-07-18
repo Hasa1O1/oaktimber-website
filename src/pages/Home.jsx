@@ -299,7 +299,7 @@ function Home() {
             </div>
           ) : (
             <>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-8">
                 {featuredProducts.map((product) => {
                   const currentImageIndex = productImageIndices[product.id] || 0
                   const currentImage = product.images ? product.images[currentImageIndex] : product.image_url

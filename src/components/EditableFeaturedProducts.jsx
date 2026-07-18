@@ -81,10 +81,10 @@ function EditableFeaturedProducts({ onFeaturedProductsChange }) {
       if (prevStr.includes(idStr)) {
         return prev.filter((id) => String(id) !== idStr)
       }
-      if (prev.length < 3) {
+      if (prev.length < 5) {
         return [...prev, cardId]
       }
-      toast.error('Maximum 3 featured products allowed')
+      toast.error('Maximum 5 featured products allowed')
       return prev
     })
   }
@@ -145,7 +145,7 @@ function EditableFeaturedProducts({ onFeaturedProductsChange }) {
           <div className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(event) => event.stopPropagation()}>
             <div className="sticky top-0 flex items-center justify-between border-b border-gray-200 bg-white p-5">
               <h3 className="text-xl font-semibold text-primary-900">
-                Featured Products & Services ({selectedCardIds.length}/3)
+                Featured Products & Services ({selectedCardIds.length}/5)
               </h3>
               <button
                 type="button"
@@ -159,7 +159,7 @@ function EditableFeaturedProducts({ onFeaturedProductsChange }) {
 
             <div className="space-y-5 p-5">
               <p className="text-sm text-gray-600">
-                Select up to 3 products or gallery items to feature on the home page. Only selected items will appear.
+                Select up to 5 products or gallery items to feature on the home page. Only selected items will appear.
               </p>
 
               {loading ? (
@@ -178,7 +178,7 @@ function EditableFeaturedProducts({ onFeaturedProductsChange }) {
                         type="checkbox"
                         checked={selectedCardIds.includes(card.id)}
                         onChange={() => toggleCardSelection(card.id)}
-                        disabled={selectedCardIds.length >= 3 && !selectedCardIds.includes(card.id)}
+                        disabled={selectedCardIds.length >= 5 && !selectedCardIds.includes(card.id)}
                         className="mt-1"
                       />
                       <div className="flex-1 min-w-0">
