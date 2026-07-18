@@ -386,7 +386,35 @@ function Home() {
                           )}
                         </div>
 
-                        {(product.description || (product.features && product.features.length > 0)) && (
+                        {hasMultipleImages && (
+                          <div className="flex gap-2 mt-4">
+                            <button
+                              type="button"
+                              onClick={() => navigateProductImage(product.id, 'prev')}
+                              className="flex-1 bg-white/90 text-black font-semibold py-3 rounded-lg hover:bg-white transition-colors flex items-center justify-center"
+                            >
+                              <FaChevronLeft />
+                            </button>
+                            {(product.description || (product.features && product.features.length > 0)) && (
+                              <button
+                                type="button"
+                                onClick={() => setExpandedCard(product)}
+                                className="flex-1 bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                              >
+                                Read More
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => navigateProductImage(product.id, 'next')}
+                              className="flex-1 bg-white/90 text-black font-semibold py-3 rounded-lg hover:bg-white transition-colors flex items-center justify-center"
+                            >
+                              <FaChevronRight />
+                            </button>
+                          </div>
+                        )}
+
+                        {!hasMultipleImages && (product.description || (product.features && product.features.length > 0)) && (
                           <button
                             type="button"
                             onClick={() => setExpandedCard(product)}
