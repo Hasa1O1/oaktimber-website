@@ -173,6 +173,22 @@ function Products() {
                       src={currentImage}
                       alt={product.title || product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onTouchStart={(e) => {
+                        e.currentTarget.dataset.touchStartX = e.touches[0].clientX
+                      }}
+                      onTouchEnd={(e) => {
+                        const touchStartX = parseFloat(e.currentTarget.dataset.touchStartX)
+                        const touchEndX = e.changedTouches[0].clientX
+                        const diff = touchStartX - touchEndX
+                        
+                        if (Math.abs(diff) > 50) {
+                          if (diff > 0) {
+                            navigateProductImage(product.id, 'next')
+                          } else {
+                            navigateProductImage(product.id, 'prev')
+                          }
+                        }
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary-200 to-primary-400 flex items-center justify-center">
