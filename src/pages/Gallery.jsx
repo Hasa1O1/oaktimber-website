@@ -22,6 +22,7 @@ function Gallery() {
   const [isCardModalOpen, setIsCardModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [expandedCard, setExpandedCard] = useState(null)
+  const [expandedCardImageIndex, setExpandedCardImageIndex] = useState(0)
 
   function openCreateModal() {
     setEditingCard(null)
@@ -213,14 +214,17 @@ function Gallery() {
                         <button
                           type="button"
                           onClick={() => navigateGalleryImage(card.id, 'prev')}
-                          className="flex-1 bg-white/90 text-black font-semibold py-3 rounded-lg hover:bg-white transition-colors flex items-center justify-center"
+                          className="w-10 h-10 bg-white/90 text-black rounded-full hover:bg-white transition-colors flex items-center justify-center flex-shrink-0"
                         >
                           <FaChevronLeft />
                         </button>
                         {(card.description || (card.features && card.features.length > 0)) && (
                           <button
                             type="button"
-                            onClick={() => setExpandedCard(card)}
+                            onClick={() => {
+                              setExpandedCard(card)
+                              setExpandedCardImageIndex(0)
+                            }}
                             className="flex-1 bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-100 transition-colors"
                           >
                             Read More
@@ -229,7 +233,7 @@ function Gallery() {
                         <button
                           type="button"
                           onClick={() => navigateGalleryImage(card.id, 'next')}
-                          className="flex-1 bg-white/90 text-black font-semibold py-3 rounded-lg hover:bg-white transition-colors flex items-center justify-center"
+                          className="w-10 h-10 bg-white/90 text-black rounded-full hover:bg-white transition-colors flex items-center justify-center flex-shrink-0"
                         >
                           <FaChevronRight />
                         </button>
@@ -239,7 +243,10 @@ function Gallery() {
                     {!hasMultipleImages && (card.description || (card.features && card.features.length > 0)) && (
                       <button
                         type="button"
-                        onClick={() => setExpandedCard(card)}
+                        onClick={() => {
+                          setExpandedCard(card)
+                          setExpandedCardImageIndex(0)
+                        }}
                         className="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-100 transition-colors mt-4"
                       >
                         Read More
@@ -309,9 +316,45 @@ function Gallery() {
               </button>
             </div>
             <div className="space-y-5 p-5">
-              {expandedCard.image_url || expandedCard.images?.[0] ? (
+              {expandedCard.images && expandedCard.images.length > 0 ? (
+                <div className="relative">
+                  <img
+                    src={expandedCard.images[expandedCardImageIndex]}
+                    alt={expandedCard.title || expandedCard.name}
+                    className="h-72 w-full rounded-lg bg-gray-100 object-cover"
+                  />
+                  {expandedCard.images.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setExpandedCardImageIndex((prev) => prev === 0 ? expandedCard.images.length - 1 : prev - 1)}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 text-black rounded-full hover:bg-white transition-colors flex items-center justify-center shadow-lg"
+                      >
+                        <FaChevronLeft />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setExpandedCardImageIndex((prev) => prev === expandedCard.images.length - 1 ? 0 : prev + 1)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 text-black rounded-full hover:bg-white transition-colors flex items-center justify-center shadow-lg"
+                      >
+                        <FaChevronRight />
+                      </button>
+                      <div className="absolute bottom-2 left-1/2 -translate-y-1/2 flex space-x-1">
+                        {expandedCard.images.map((_, index) => (
+                          <div
+                            key={index}
+                            className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                              index === expandedCardImageIndex ? 'bg-white' : 'bg-white/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : expandedCard.image_url ? (
                 <img
-                  src={expandedCard.image_url || expandedCard.images[0]}
+                  src={expandedCard.image_url}
                   alt={expandedCard.title || expandedCard.name}
                   className="h-72 w-full rounded-lg bg-gray-100 object-cover"
                 />
